@@ -2,8 +2,16 @@
 // Количество объявлений
 var ADS_QUANTITY = 8;
 // Объявляем массив объявлений
-var adsArrayRandom = [];
-
+var adsArrayRandom;
+// Ищем разные места
+var mapBlock = document.querySelector('.map');
+var mapMarker = mapBlock.querySelector('.map__pins');
+var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
+var mapCard = document.querySelector('.map');
+var mapFiltersContainer = document.querySelector('.map__filters-container');
+// Смещения для нахождения кончика метки - противоречит заданию, но соответствует реальности, отсчет от центра
+var mapMarkerXOffset = 0;
+var mapMarkerYOffset = 35;
 // Здесь храним временные данные для генерации объявлений
 var variantsOf = {
   avatar: 'img/avatars/user{{xx}}.png',
@@ -21,11 +29,10 @@ var variantsOf = {
   guestsMax: 10,
   checkinCheckout: ['12:00', '13:00', '14:00'],
   features: ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
-  description: '',
+  description: 'Описание должно быть пустым!!!',
   photos: ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', '' +
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg', '' +
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg'],
-  // photos: ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'],
   locationXMin: 300,
   locationXMax: 900,
   locationYMin: 150,
@@ -66,7 +73,7 @@ var splitStringBySeparatorToArray = function (string, separator) {
 /**
  * Функция, которая перемешивает массив!
  * @param {array} array - массив для перемешивания
- * @return {Array} - возвращает перемешанный масив
+ * @return {array} - возвращает перемешанный масив
  */
 var mixArray = function (array) {
   var temp;
@@ -108,7 +115,7 @@ var generateArrOfAds = function (variantsOfObject, adsQuantity) {
         checkin: chooseRandomArrElement(variantsOfObject.checkinCheckout),
         checkout: chooseRandomArrElement(variantsOfObject.checkinCheckout),
         features: cropArrayFromEnd(variantsOfObject.features),
-        description: '',
+        description: variantsOfObject.description,
         photos: mixArray(variantsOfObject.photos)
       },
       location: {
@@ -120,5 +127,135 @@ var generateArrOfAds = function (variantsOfObject, adsQuantity) {
   }
   return adsArray;
 };
+/**
+ * Функция, которая скрывает или показывает блок, удаляя или добавляя
+ * класс 'map--faded'
+ * @param {object} block - блок для манипуляций
+ * @param {boolean} status - видно или нет
+ */
+var setOrRemoveClassMapFaded = function (block, status) {
+  if (status) {
+    block.classList.remove('map--faded');
+  } else {
+    block.classList.add('map--faded');
+  }
+};
+/**
+ * функцию создания DOM-элемента маркера на основе JS-объекта
+ * @param {object} adsObject - Объект с объявлением
+ * @param {number} offsetX - отступ по оси Х
+ * @param {number} offsetY - отступ по оси У
+ * @return {HTMLButtonElement} - баттан, который возвращается
+ */
+var createMapMarkerElement = function (adsObject, offsetX, offsetY) {
+  var newMarker = document.createElement('button');
+  newMarker.style.left = (adsObject.location.x - offsetX) + 'px';
+  newMarker.style.top = (adsObject.location.y - offsetY) + 'px';
+  newMarker.className = 'map__pin';
+  newMarker.innerHTML = '<img src="' + adsObject.author.avatar + '" width="40" height="40" draggable="false">';
+  return newMarker;
+};
+/**
+ * Функцию заполнения блока маркеров DOM-элементами на основе массива JS-объектов
+ * @param {array} ads - массив объектов объявлений
+ * @param {object} domBlock - блок, куда все запкидываем
+ * @param {number} markerOffsetX - отступ маркера по оси Х
+ * @param {number} markerOffsetY - отступ маркера по оси У
+ */
+var fillMapFragmentByMarkers = function (ads, domBlock, markerOffsetX, markerOffsetY) {
+  for (var j = 0; j < ADS_QUANTITY; j++) {
+    domBlock.appendChild(createMapMarkerElement(ads[j], markerOffsetX, markerOffsetY));
+  }
+};
+/**
+ * Функция, переводящая с английского на русский;)
+ * @param {string} offerType - строка на английском
+ * @return {string} - строка на русском
+ */
+var translateOfferToRus = function (offerType) {
+  if (offerType === 'flat') {
+    return 'Квартира';
+  } else if (offerType === 'bungalo') {
+    return 'Бунгало';
+  } else if (offerType === 'house') {
+    return 'Дом';
+  } else {
+    return 'Незивестно что';
+  }
+};
+/**
+ * функция генерации элемента блока в стиле ki ищ списка фич
+ * @param {string} arrayElement - элемент массива
+ * @return {HTMLLIElement} - возвращает блок для вставки в стиле списка
+ */
+var generateFeatureLi = function (arrayElement) {
+  var newElement = document.createElement('li');
+  newElement.className = 'feature feature--' + arrayElement;
+  return newElement;
+};
+/**
+ * функция генерации блока в стиле img из элемента списка картинок
+ * @param {string} arrayElement - элемент массива
+ * @return {HTMLImageElement} - возвращает блок для вставки в стиле списка
+ */
+var generatePictureLi = function (arrayElement) {
+  var newElement = document.createElement('li').appendChild(document.createElement('img'));
+  newElement.setAttribute('src', arrayElement);
+  newElement.setAttribute('width', '70');
+  return newElement;
+};
+/**
+ * Функция, которая берет блок и заполняет его элементамми из массива, применяя к ним функцию.
+ * @param {object} listBlock - блок для заполнения
+ * @param {array} array - массив
+ * @param {function} specialFunction - специальная функция для обработки массива
+ */
+var fillBlockByArrayWithFunction = function (listBlock, array, specialFunction) {
+  while (listBlock.firstChild) {
+    listBlock.removeChild(listBlock.firstChild);
+  }
+  for (var w = 0; w < array.length; w++) {
+    listBlock.appendChild(specialFunction(array[w]));
+  }
+};
+/**
+ * функуия создает DOM элемент карточки на основе JS объекта и шаблона
+ * @param {object} adsObject - объкт объявления
+ * @param {object} template - шаблон
+ * @return {ActiveX.IXMLDOMNode | Node} - возвращает заполненный блок
+ */
+var createMapCardElement = function (adsObject, template) {
+  var newElement = template.cloneNode(true);
+  newElement.querySelector('h3').textContent = adsObject.offer.title;
+  newElement.querySelector('p small').textContent = adsObject.offer.address;
+  newElement.querySelector('.popup__price').textContent = adsObject.offer.price + ' ₽/ночь';
+  newElement.querySelector('h4').textContent = translateOfferToRus(adsObject.offer.type);
+  var paragraphOfElement = newElement.querySelectorAll('p');
+  paragraphOfElement[2].textContent = adsObject.offer.rooms + ' комнаты для ' +
+    adsObject.offer.guests + ' гостей';
+  paragraphOfElement[3].textContent = 'Заезд после ' + adsObject.offer.checkin +
+    ', выезд до ' + adsObject.offer.checkout;
+  // var listPopupFeatures = newElement.querySelector('.popup__features');
+  fillBlockByArrayWithFunction(newElement.querySelector('.popup__features'), adsObject.offer.features, generateFeatureLi);
+  paragraphOfElement[4].textContent = adsObject.offer.description;
+  fillBlockByArrayWithFunction(newElement.querySelector('.popup__pictures'), adsObject.offer.photos, generatePictureLi);
+  // Меняе SRC....
+  newElement.querySelector('.popup__avatar').setAttribute('src', adsObject.author.avatar);
+  return newElement;
+};
+// Генерируем обявления
 adsArrayRandom = generateArrOfAds(variantsOf, ADS_QUANTITY);
-
+// Активизируем карту
+setOrRemoveClassMapFaded(mapBlock, true);
+// Создаем фрагмент для маркеров
+var mapMarkerFragment = document.createDocumentFragment();
+// Заполняем фрагмент маркеров объявлениями
+fillMapFragmentByMarkers(adsArrayRandom, mapMarkerFragment, mapMarkerXOffset, mapMarkerYOffset);
+// Отрисовываем фрагмент там, где надо;)
+mapMarker.appendChild(mapMarkerFragment);
+// Создаем фрагмент для карточки
+var mapCardFragment = document.createDocumentFragment();
+// Заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
+mapCardFragment.appendChild(createMapCardElement(adsArrayRandom[0], mapCardTemplate));
+// Заменяем диалог на фрагмент
+mapCard.insertBefore(mapCardFragment, mapFiltersContainer);
