@@ -78,11 +78,7 @@ var splitStringBySeparatorToArray = function (string, separator) {
 var mixArray = function (array) {
   var temp;
   var randomIndex;
-  var mixedArray = [];
-  // если писать просто mixedArray = array, то передается по ссылке чтоли?
-  for (var a = 0; a < array.length; a++) {
-    mixedArray[a] = array[a];
-  }
+  var mixedArray = array.slice();
   for (var k = 0; k < mixedArray.length; k++) {
     randomIndex = randomiseIntegerMinToMax(k, mixedArray.length - 1);
     temp = mixedArray[k];
