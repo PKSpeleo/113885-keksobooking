@@ -148,7 +148,12 @@ var createMapMarkerElement = function (adsObject, offsetX, offsetY) {
   newMarker.style.left = (adsObject.location.x - offsetX) + 'px';
   newMarker.style.top = (adsObject.location.y - offsetY) + 'px';
   newMarker.className = 'map__pin';
-  newMarker.innerHTML = '<img src="' + adsObject.author.avatar + '" width="40" height="40" draggable="false">';
+  var newMarkerImg = document.createElement('img');
+  newMarkerImg.setAttribute('src', adsObject.author.avatar);
+  newMarkerImg.setAttribute('width', '40');
+  newMarkerImg.setAttribute('height', '40');
+  newMarkerImg.setAttribute('draggable', 'false');
+  newMarker.appendChild(newMarkerImg);
   return newMarker;
 };
 /**
