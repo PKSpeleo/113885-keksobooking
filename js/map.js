@@ -84,13 +84,6 @@ var chooseRandomArrElement = function (arr) {
 var cropArrayFromEnd = function (arr) {
   return arr.slice(0, randomiseIntegerMinToMax(0, arr.length));
 };
-var splitStringBySeparatorToArray = function (string, separator) {
-  var arr = [];
-  string.split(separator).forEach(function (arrElement, indexOfElement) {
-    arr[indexOfElement] = arrElement;
-  });
-  return arr;
-};
 
 /**
  * Функция, которая перемешивает массив!
@@ -118,7 +111,7 @@ var mixArray = function (array) {
  */
 var generateArrOfAds = function (variantsOfObject, adsQuantity) {
   var adsArray = [];
-  var avatar = splitStringBySeparatorToArray(variantsOfObject.avatar, variantsOfObject.avatarSeparator);
+  var avatar = variantsOfObject.avatar.split(variantsOfObject.avatarSeparator);
   for (var i = 0; i < adsQuantity; i++) {
     adsArray[i] = {
       author: {
