@@ -3,8 +3,8 @@
 var ADS_QUANTITY = 8;
 
 // Смещения для нахождения кончика метки - противоречит заданию, но соответствует реальности, отсчет от центра
-var mapMarkerXOffset = 0;
-var mapMarkerYOffset = 35;
+var MAP_MARKER_X_OFFSET = 0;
+var MAP_MARKER_Y_OFFSET = 35;
 
 // Здесь храним временные данные для генерации объявлений
 var VARIANTS_OF = {
@@ -286,7 +286,7 @@ setOrRemoveClassMapFaded(mapBlock, true);
 // Создаем фрагмент для маркеров
 var mapMarkerFragment = document.createDocumentFragment();
 // Заполняем фрагмент маркеров объявлениями
-fillMapFragmentByMarkers(adsArrayRandom, mapMarkerFragment, mapMarkerXOffset, mapMarkerYOffset);
+fillMapFragmentByMarkers(adsArrayRandom, mapMarkerFragment, MAP_MARKER_X_OFFSET, MAP_MARKER_Y_OFFSET);
 // Отрисовываем фрагмент там, где надо;)
 var mapMarker = mapBlock.querySelector('.map__pins');
 mapMarker.appendChild(mapMarkerFragment);
