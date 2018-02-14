@@ -90,21 +90,14 @@ var cropArrayFromEnd = function (arr) {
  * @param {array} array - массив для перемешивания
  * @return {array} - возвращает перемешанный масив
  */
-var mixArray = function (array) {
-  var temp;
-  var randomIndex;
-  var mixedArray = array.slice();
-  for (var k = 0; k < mixedArray.length; k++) {
-    randomIndex = randomiseIntegerMinToMax(k, mixedArray.length - 1);
-    temp = mixedArray[k];
-    mixedArray[k] = mixedArray[randomIndex];
-    mixedArray[randomIndex] = temp;
-  }
-  return mixedArray;
+var mixArrayRandomly = function (array) {
+  return array.slice().sort(function () {
+    return randomiseIntegerMinToMax(0, 1);
+  });
 };
 
 /**
- * Функция создания массива объявлений с данными
+ * Функция создания массива объектов объявлений с данными
  * @param {object} variantsOfObject - объект с вариантами содержимого объявлений
  * @param {number} adsQuantity - количество объявлений
  * @return {Array} - возвращает массив объектов объявлений
@@ -128,7 +121,7 @@ var generateArrOfAds = function (variantsOfObject, adsQuantity) {
         checkout: chooseRandomArrElement(variantsOfObject.checkinCheckout),
         features: cropArrayFromEnd(variantsOfObject.features),
         description: variantsOfObject.description,
-        photos: mixArray(variantsOfObject.photos)
+        photos: mixArrayRandomly(variantsOfObject.photos)
       },
       location: {
         x: randomiseIntegerMinToMax(variantsOfObject.locationXMax, variantsOfObject.locationXMin),
