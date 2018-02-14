@@ -151,18 +151,18 @@ var setOrRemoveClassMapFaded = function (block, status) {
 
 /**
  * функцию создания DOM-элемента маркера на основе JS-объекта
- * @param {object} adsObject - Объект с объявлением
- * @param {number} offsetX - отступ по оси Х
- * @param {number} offsetY - отступ по оси У
+ * @param {object} adObject - Объект с объявлением
+ * @param {number} offsetX - отступ стрелки маркера по оси Х
+ * @param {number} offsetY - отступ стрелки маркера по оси У
  * @return {HTMLButtonElement} - баттан, который возвращается
  */
-var createMapMarkerElement = function (adsObject, offsetX, offsetY) {
+var createMapMarkerElement = function (adObject, offsetX, offsetY) {
   var newMarker = document.createElement('button');
-  newMarker.style.left = (adsObject.location.x - offsetX) + 'px';
-  newMarker.style.top = (adsObject.location.y - offsetY) + 'px';
+  newMarker.style.left = (adObject.location.x - offsetX) + 'px';
+  newMarker.style.top = (adObject.location.y - offsetY) + 'px';
   newMarker.className = 'map__pin';
   var newMarkerImg = document.createElement('img');
-  newMarkerImg.setAttribute('src', adsObject.author.avatar);
+  newMarkerImg.setAttribute('src', adObject.author.avatar);
   newMarkerImg.setAttribute('width', '40');
   newMarkerImg.setAttribute('height', '40');
   newMarkerImg.setAttribute('draggable', 'false');
