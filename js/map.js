@@ -7,26 +7,50 @@ var mapMarkerXOffset = 0;
 var mapMarkerYOffset = 35;
 
 // Здесь храним временные данные для генерации объявлений
-var variantsOf = {
+var VARIANTS_OF = {
   avatar: 'img/avatars/user{{xx}}.png',
   avatarSeparator: '{{xx}}',
-  title: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный ' +
-  'прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый ' +
-  'негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'],
+  title: [
+    'Большая уютная квартира',
+    'Маленькая неуютная квартира',
+    'Огромный прекрасный дворец',
+    'Маленький ужасный дворец',
+    'Красивый гостевой домик',
+    'Некрасивый негостеприимный домик',
+    'Уютное бунгало далеко от моря',
+    'Неуютное бунгало по колено в воде'
+  ],
   address: '',
   priceMin: 1000,
   priceMax: 1000000,
-  type: ['flat', 'house', 'bungalo'],
+  type: [
+    'flat',
+    'house',
+    'bungalo'
+  ],
   roomsMin: 1,
   roomsMax: 5,
   guestsMin: 1,
   guestsMax: 10,
-  checkinCheckout: ['12:00', '13:00', '14:00'],
-  features: ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'],
+  checkinCheckout: [
+    '12:00',
+    '13:00',
+    '14:00'
+  ],
+  features: [
+    'wifi',
+    'dishwasher',
+    'parking',
+    'washer',
+    'elevator',
+    'conditioner'
+  ],
   description: 'Описание должно быть пустым!!!',
-  photos: ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', '' +
-  'http://o0.github.io/assets/images/tokyo/hotel2.jpg', '' +
-  'http://o0.github.io/assets/images/tokyo/hotel3.jpg'],
+  photos: [
+    'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
+    'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
+    'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
+  ],
   locationXMin: 300,
   locationXMax: 900,
   locationYMin: 150,
@@ -253,7 +277,7 @@ var createMapCardElement = function (adsObject, template) {
 };
 
 // Генерируем обявления
-var adsArrayRandom = generateArrOfAds(variantsOf, ADS_QUANTITY);
+var adsArrayRandom = generateArrOfAds(VARIANTS_OF, ADS_QUANTITY);
 
 // Активизируем карту
 var mapBlock = document.querySelector('.map');
@@ -261,21 +285,17 @@ setOrRemoveClassMapFaded(mapBlock, true);
 
 // Создаем фрагмент для маркеров
 var mapMarkerFragment = document.createDocumentFragment();
-
 // Заполняем фрагмент маркеров объявлениями
 fillMapFragmentByMarkers(adsArrayRandom, mapMarkerFragment, mapMarkerXOffset, mapMarkerYOffset);
-
 // Отрисовываем фрагмент там, где надо;)
 var mapMarker = mapBlock.querySelector('.map__pins');
 mapMarker.appendChild(mapMarkerFragment);
 
 // Создаем фрагмент для карточки
 var mapCardFragment = document.createDocumentFragment();
-
 // Заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
 var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
 mapCardFragment.appendChild(createMapCardElement(adsArrayRandom[0], mapCardTemplate));
-
 // Заменяем диалог на фрагмент
 var mapCard = document.querySelector('.map');
 var mapFiltersContainer = document.querySelector('.map__filters-container');
