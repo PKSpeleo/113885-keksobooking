@@ -8,8 +8,8 @@ var MAP_MARKER_Y_OFFSET = 35;
 
 // Здесь храним временные данные для генерации объявлений
 var VARIANTS_OF = {
-  avatar: 'img/avatars/user{{xx}}.png',
-  avatarSeparator: '{{xx}}',
+  avatarPartOne: 'img/avatars/user0',
+  avatarPartTwo: '.png',
   title: [
     'Большая уютная квартира',
     'Маленькая неуютная квартира',
@@ -20,7 +20,7 @@ var VARIANTS_OF = {
     'Уютное бунгало далеко от моря',
     'Неуютное бунгало по колено в воде'
   ],
-  address: '',
+  addressSeparator: ', ',
   priceMin: 1000,
   priceMax: 1000000,
   type: [
@@ -45,7 +45,7 @@ var VARIANTS_OF = {
     'elevator',
     'conditioner'
   ],
-  description: 'Описание должно быть пустым!!!',
+  description: '',
   photos: [
     'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
     'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
@@ -102,17 +102,20 @@ var mixArrayRandomly = function (array) {
  * @param {number} adsQuantity - количество объявлений
  * @return {Array} - возвращает массив объектов объявлений
  */
-var generateArrOfAds = function (variantsOfObject, adsQuantity) {
+var generateAds = function (variantsOfObject, adsQuantity) {
   var adsArray = [];
-  var avatar = variantsOfObject.avatar.split(variantsOfObject.avatarSeparator);
+  var locationX;
+  var locationY;
   for (var i = 0; i < adsQuantity; i++) {
+    locationX = randomiseIntegerMinToMax(variantsOfObject.locationXMax, variantsOfObject.locationXMin);
+    locationY = randomiseIntegerMinToMax(variantsOfObject.locationYMin, variantsOfObject.locationYMax);
     adsArray[i] = {
       author: {
-        avatar: avatar[0] + '0' + (i + 1) + avatar[1]
+        avatar: variantsOfObject.avatarPartOne + (i + 1) + variantsOfObject.avatarPartTwo
       },
       offer: {
         title: variantsOfObject.title[i],
-        address: '',
+        address: locationX + variantsOfObject.addressSeparator + locationY,
         price: randomiseIntegerMinToMax(variantsOfObject.priceMin, variantsOfObject.priceMax),
         type: chooseRandomArrElement(variantsOfObject.type),
         rooms: randomiseIntegerMinToMax(variantsOfObject.roomsMin, variantsOfObject.roomsMax),
@@ -124,11 +127,10 @@ var generateArrOfAds = function (variantsOfObject, adsQuantity) {
         photos: mixArrayRandomly(variantsOfObject.photos)
       },
       location: {
-        x: randomiseIntegerMinToMax(variantsOfObject.locationXMax, variantsOfObject.locationXMin),
-        y: randomiseIntegerMinToMax(variantsOfObject.locationYMin, variantsOfObject.locationYMax)
+        x: locationX,
+        y: locationY
       }
     };
-    adsArray[i].offer.address = adsArray[i].location.x + ', ' + adsArray[i].location.y;
   }
   return adsArray;
 };
@@ -263,7 +265,7 @@ var createMapCardElement = function (adsObject, template) {
 };
 
 // Генерируем обявления
-var adsArrayRandom = generateArrOfAds(VARIANTS_OF, ADS_QUANTITY);
+var adsArrayRandom = generateAds(VARIANTS_OF, ADS_QUANTITY);
 
 // Активизируем карту
 var mapBlock = document.querySelector('.map');
