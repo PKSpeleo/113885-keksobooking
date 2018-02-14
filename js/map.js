@@ -70,14 +70,14 @@ var randomiseIntegerMinToMax = function (min, max) {
 /**
  * Функция выбора случайных элеменов массива
  * @param {array} arr - массив
- * @return {string} - случайный элемент массива
+ * @return {*} - случайный элемент массива
  */
 var chooseRandomArrElement = function (arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 };
 
 /**
- * Функция урезания массива с конца
+ * Функция откидывания рандомного количества элементов массива с конца
  * @param {array} arr - массив от которого надо откинуть хваост
  * @return {array} - обрезанный с хвоста массив
  */
