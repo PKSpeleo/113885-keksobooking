@@ -152,34 +152,35 @@ var setOrRemoveClassMapFaded = function (block, status) {
 /**
  * функцию создания DOM-элемента маркера на основе JS-объекта
  * @param {object} adObject - Объект с объявлением
+ * @param {object} templateObject - Объект с шаблоном
  * @param {number} offsetX - отступ стрелки маркера по оси Х
  * @param {number} offsetY - отступ стрелки маркера по оси У
- * @return {HTMLButtonElement} - баттан, который возвращается
+ * @return {IXMLDOMNode | Node} - баттан, который возвращается
  */
-var createMapMarkerElement = function (adObject, offsetX, offsetY) {
-  var newMarker = document.createElement('button');
-  newMarker.style.left = (adObject.location.x - offsetX) + 'px';
-  newMarker.style.top = (adObject.location.y - offsetY) + 'px';
-  newMarker.className = 'map__pin';
-  var newMarkerImg = document.createElement('img');
-  newMarkerImg.setAttribute('src', adObject.author.avatar);
-  newMarkerImg.setAttribute('width', '40');
-  newMarkerImg.setAttribute('height', '40');
-  newMarkerImg.setAttribute('draggable', 'false');
-  newMarker.appendChild(newMarkerImg);
-  return newMarker;
+var createMapMarkerElement = function (adObject, templateObject, offsetX, offsetY) {
+  var newMarkerButtonFromTemplate = templateObject.cloneNode(true);
+  newMarkerButtonFromTemplate.style.left = (adObject.location.x - offsetX) + 'px';
+  newMarkerButtonFromTemplate.style.top = (adObject.location.y - offsetY) + 'px';
+  var newMarkerButtonImageFromTemplate = newMarkerButtonFromTemplate.querySelector('img');
+  newMarkerButtonImageFromTemplate.setAttribute('src', adObject.author.avatar);
+  newMarkerButtonImageFromTemplate.setAttribute('width', '40');
+  newMarkerButtonImageFromTemplate.setAttribute('height', '40');
+  newMarkerButtonImageFromTemplate.setAttribute('draggable', 'false');
+  return newMarkerButtonFromTemplate;
 };
 
 /**
  * Функцию заполнения блока маркеров DOM-элементами на основе массива JS-объектов
+ * с применением шаблона
  * @param {array} ads - массив объектов объявлений
  * @param {object} domBlock - блок, куда все запкидываем
+ * @param {object} templateBlock - блок шаблона, на основе которого мы создаем маркеры
  * @param {number} markerOffsetX - отступ маркера по оси Х
  * @param {number} markerOffsetY - отступ маркера по оси У
  */
-var fillMapFragmentByMarkers = function (ads, domBlock, markerOffsetX, markerOffsetY) {
+var fillMapFragmentByMarkersWithTemplate = function (ads, domBlock, templateBlock, markerOffsetX, markerOffsetY) {
   for (var j = 0; j < ADS_QUANTITY; j++) {
-    domBlock.appendChild(createMapMarkerElement(ads[j], markerOffsetX, markerOffsetY));
+    domBlock.appendChild(createMapMarkerElement(ads[j], templateBlock, markerOffsetX, markerOffsetY));
   }
 };
 
@@ -271,10 +272,14 @@ var adsArrayRandom = generateAds(VARIANTS_OF, ADS_QUANTITY);
 var mapBlock = document.querySelector('.map');
 setOrRemoveClassMapFaded(mapBlock, true);
 
+// находим шаблон
+var templateFragment = document.querySelector('template').content;
+
 // Создаем фрагмент для маркеров
 var mapMarkerFragment = document.createDocumentFragment();
+var mapMarketTemplateFragment = templateFragment.querySelector('.map__pin');
 // Заполняем фрагмент маркеров объявлениями
-fillMapFragmentByMarkers(adsArrayRandom, mapMarkerFragment, MAP_MARKER_X_OFFSET, MAP_MARKER_Y_OFFSET);
+fillMapFragmentByMarkersWithTemplate(adsArrayRandom, mapMarkerFragment, mapMarketTemplateFragment, MAP_MARKER_X_OFFSET, MAP_MARKER_Y_OFFSET);
 // Отрисовываем фрагмент там, где надо;)
 var mapMarker = mapBlock.querySelector('.map__pins');
 mapMarker.appendChild(mapMarkerFragment);
