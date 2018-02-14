@@ -1,17 +1,11 @@
 'use strict';
 // Количество объявлений
 var ADS_QUANTITY = 8;
-// Объявляем массив объявлений
-var adsArrayRandom;
-// Ищем разные места
-var mapBlock = document.querySelector('.map');
-var mapMarker = mapBlock.querySelector('.map__pins');
-var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
-var mapCard = document.querySelector('.map');
-var mapFiltersContainer = document.querySelector('.map__filters-container');
+
 // Смещения для нахождения кончика метки - противоречит заданию, но соответствует реальности, отсчет от центра
 var mapMarkerXOffset = 0;
 var mapMarkerYOffset = 35;
+
 // Здесь храним временные данные для генерации объявлений
 var variantsOf = {
   avatar: 'img/avatars/user{{xx}}.png',
@@ -38,6 +32,7 @@ var variantsOf = {
   locationYMin: 150,
   locationYMax: 500
 };
+
 /**
  * Генерируем случайнео целое число от минимума (вкл) до максимума (вкл)
  * @param {number} min - минимльное целое число (вкл)
@@ -47,6 +42,7 @@ var variantsOf = {
 var randomiseIntegerMinToMax = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
 /**
  * Функция выбора случайных элеменов массива
  * @param {array} arr - массив
@@ -55,6 +51,7 @@ var randomiseIntegerMinToMax = function (min, max) {
 var chooseRandomArrElement = function (arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 };
+
 /**
  * Функция урезания массива с конца
  * @param {array} arr - массив от которого надо откинуть хваост
@@ -70,6 +67,7 @@ var splitStringBySeparatorToArray = function (string, separator) {
   });
   return arr;
 };
+
 /**
  * Функция, которая перемешивает массив!
  * @param {array} array - массив для перемешивания
@@ -87,6 +85,7 @@ var mixArray = function (array) {
   }
   return mixedArray;
 };
+
 /**
  * Функция создания массива объявлений с данными
  * @param {object} variantsOfObject - объект с вариантами содержимого объявлений
@@ -123,6 +122,7 @@ var generateArrOfAds = function (variantsOfObject, adsQuantity) {
   }
   return adsArray;
 };
+
 /**
  * Функция, которая скрывает или показывает блок, удаляя или добавляя
  * класс 'map--faded'
@@ -136,6 +136,7 @@ var setOrRemoveClassMapFaded = function (block, status) {
     block.classList.add('map--faded');
   }
 };
+
 /**
  * функцию создания DOM-элемента маркера на основе JS-объекта
  * @param {object} adsObject - Объект с объявлением
@@ -156,6 +157,7 @@ var createMapMarkerElement = function (adsObject, offsetX, offsetY) {
   newMarker.appendChild(newMarkerImg);
   return newMarker;
 };
+
 /**
  * Функцию заполнения блока маркеров DOM-элементами на основе массива JS-объектов
  * @param {array} ads - массив объектов объявлений
@@ -168,6 +170,7 @@ var fillMapFragmentByMarkers = function (ads, domBlock, markerOffsetX, markerOff
     domBlock.appendChild(createMapMarkerElement(ads[j], markerOffsetX, markerOffsetY));
   }
 };
+
 /**
  * Функция, переводящая с английского на русский;)
  * @param {string} offerType - строка на английском
@@ -184,6 +187,7 @@ var translateOfferToRus = function (offerType) {
     return 'Незивестно что';
   }
 };
+
 /**
  * функция генерации элемента блока в стиле ki ищ списка фич
  * @param {string} arrayElement - элемент массива
@@ -194,6 +198,7 @@ var generateFeatureLi = function (arrayElement) {
   newElement.className = 'feature feature--' + arrayElement;
   return newElement;
 };
+
 /**
  * функция генерации блока в стиле img из элемента списка картинок
  * @param {string} arrayElement - элемент массива
@@ -205,6 +210,7 @@ var generatePictureLi = function (arrayElement) {
   newElement.setAttribute('width', '70');
   return newElement;
 };
+
 /**
  * Функция, которая берет блок и заполняет его элементамми из массива, применяя к ним функцию.
  * @param {object} listBlock - блок для заполнения
@@ -219,6 +225,7 @@ var fillBlockByArrayWithFunction = function (listBlock, array, specialFunction) 
     listBlock.appendChild(specialFunction(array[w]));
   }
 };
+
 /**
  * функуия создает DOM элемент карточки на основе JS объекта и шаблона
  * @param {object} adsObject - объкт объявления
@@ -244,19 +251,32 @@ var createMapCardElement = function (adsObject, template) {
   newElement.querySelector('.popup__avatar').setAttribute('src', adsObject.author.avatar);
   return newElement;
 };
+
 // Генерируем обявления
-adsArrayRandom = generateArrOfAds(variantsOf, ADS_QUANTITY);
+var adsArrayRandom = generateArrOfAds(variantsOf, ADS_QUANTITY);
+
 // Активизируем карту
+var mapBlock = document.querySelector('.map');
 setOrRemoveClassMapFaded(mapBlock, true);
+
 // Создаем фрагмент для маркеров
 var mapMarkerFragment = document.createDocumentFragment();
+
 // Заполняем фрагмент маркеров объявлениями
 fillMapFragmentByMarkers(adsArrayRandom, mapMarkerFragment, mapMarkerXOffset, mapMarkerYOffset);
+
 // Отрисовываем фрагмент там, где надо;)
+var mapMarker = mapBlock.querySelector('.map__pins');
 mapMarker.appendChild(mapMarkerFragment);
+
 // Создаем фрагмент для карточки
 var mapCardFragment = document.createDocumentFragment();
+
 // Заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
+var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
 mapCardFragment.appendChild(createMapCardElement(adsArrayRandom[0], mapCardTemplate));
+
 // Заменяем диалог на фрагмент
+var mapCard = document.querySelector('.map');
+var mapFiltersContainer = document.querySelector('.map__filters-container');
 mapCard.insertBefore(mapCardFragment, mapFiltersContainer);
