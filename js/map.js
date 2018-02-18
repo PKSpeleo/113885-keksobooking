@@ -185,17 +185,6 @@ var fillMapFragmentByMarkersWithTemplate = function (ads, domBlock, templateBloc
 };
 
 /**
- * функция генерации элемента блока в стиле ki ищ списка фич
- * @param {string} arrayElement - элемент массива
- * @return {HTMLLIElement} - возвращает блок для вставки в стиле списка
- */
-var generateFeatureLi = function (arrayElement) {
-  var newElement = document.createElement('li');
-  newElement.className = 'feature feature--' + arrayElement;
-  return newElement;
-};
-
-/**
  * функция генерации блока в стиле img из элемента списка картинок
  * @param {string} arrayElement - элемент массива
  * @return {HTMLImageElement} - возвращает блок для вставки в стиле списка
@@ -223,6 +212,23 @@ var fillBlockByArrayWithFunction = function (listBlock, array, specialFunction) 
 };
 
 /**
+ * Функция редактирования шаблона в зависимости от того, есть ли фичи в объявлении
+ * @param {object} listBlock - блок в шаблоне в отором вносим корректировки
+ * @param {array} array - массив фич, кторые нам надо отобразить
+ */
+var fillPopupFeaturesBlock = function (listBlock, array) {
+  var liList = listBlock.querySelectorAll('.feature');
+  for (var liIndex = 0; liIndex < liList.length; liIndex++) {
+    for (var arrIndex = 0; arrIndex < liList.length; arrIndex++) {
+      if (liList[liIndex].classList[1] === ('feature--' + array[arrIndex])) {
+        break;
+      } else if (arrIndex === liList.length - 1) {
+        listBlock.removeChild(liList[liIndex]);
+      }
+    }
+  }
+};
+/**
  * функуия создает DOM элемент карточки на основе JS объекта, шаблона
  * и вариантов перевода;_
  * @param {object} adsObject - объкт объявления
@@ -241,8 +247,8 @@ var createMapCardElement = function (adsObject, template, variantsOfType) {
     adsObject.offer.guests + ' гостей';
   paragraphOfElement[3].textContent = 'Заезд после ' + adsObject.offer.checkin +
     ', выезд до ' + adsObject.offer.checkout;
-  // var listPopupFeatures = newElement.querySelector('.popup__features');
-  fillBlockByArrayWithFunction(newElement.querySelector('.popup__features'), adsObject.offer.features, generateFeatureLi);
+  var listPopupFeatures = newElement.querySelector('.popup__features');
+  fillPopupFeaturesBlock(listPopupFeatures, adsObject.offer.features);
   paragraphOfElement[4].textContent = adsObject.offer.description;
   fillBlockByArrayWithFunction(newElement.querySelector('.popup__pictures'), adsObject.offer.photos, generatePictureLi);
   // Меняе SRC....
