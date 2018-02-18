@@ -23,11 +23,11 @@ var VARIANTS_OF = {
   addressSeparator: ', ',
   priceMin: 1000,
   priceMax: 1000000,
-  type: [
-    'flat',
-    'house',
-    'bungalo'
-  ],
+  type: {
+    flat: 'Квартира',
+    house: 'Дом',
+    bungalo: 'Бунгало'
+  },
   roomsMin: 1,
   roomsMax: 5,
   guestsMin: 1,
@@ -117,7 +117,7 @@ var generateAds = function (variantsOfObject, adsQuantity) {
         title: variantsOfObject.title[i],
         address: locationX + variantsOfObject.addressSeparator + locationY,
         price: randomiseIntegerMinToMax(variantsOfObject.priceMin, variantsOfObject.priceMax),
-        type: chooseRandomArrElement(variantsOfObject.type),
+        type: chooseRandomArrElement(Object.keys(variantsOfObject.type)),
         rooms: randomiseIntegerMinToMax(variantsOfObject.roomsMin, variantsOfObject.roomsMax),
         guests: randomiseIntegerMinToMax(variantsOfObject.guestsMin, variantsOfObject.guestsMax),
         checkin: chooseRandomArrElement(variantsOfObject.checkinCheckout),
@@ -185,23 +185,6 @@ var fillMapFragmentByMarkersWithTemplate = function (ads, domBlock, templateBloc
 };
 
 /**
- * Функция, переводящая с английского на русский;)
- * @param {string} offerType - строка на английском
- * @return {string} - строка на русском
- */
-var translateOfferToRus = function (offerType) {
-  if (offerType === 'flat') {
-    return 'Квартира';
-  } else if (offerType === 'bungalo') {
-    return 'Бунгало';
-  } else if (offerType === 'house') {
-    return 'Дом';
-  } else {
-    return 'Незивестно что';
-  }
-};
-
-/**
  * функция генерации элемента блока в стиле ki ищ списка фич
  * @param {string} arrayElement - элемент массива
  * @return {HTMLLIElement} - возвращает блок для вставки в стиле списка
@@ -240,17 +223,19 @@ var fillBlockByArrayWithFunction = function (listBlock, array, specialFunction) 
 };
 
 /**
- * функуия создает DOM элемент карточки на основе JS объекта и шаблона
+ * функуия создает DOM элемент карточки на основе JS объекта, шаблона
+ * и вариантов перевода;_
  * @param {object} adsObject - объкт объявления
  * @param {object} template - шаблон
+ * @param {object} variantsOfType - некий шаблон для вариантов перевода
  * @return {ActiveX.IXMLDOMNode | Node} - возвращает заполненный блок
  */
-var createMapCardElement = function (adsObject, template) {
+var createMapCardElement = function (adsObject, template, variantsOfType) {
   var newElement = template.cloneNode(true);
   newElement.querySelector('h3').textContent = adsObject.offer.title;
   newElement.querySelector('p small').textContent = adsObject.offer.address;
   newElement.querySelector('.popup__price').textContent = adsObject.offer.price + ' ₽/ночь';
-  newElement.querySelector('h4').textContent = translateOfferToRus(adsObject.offer.type);
+  newElement.querySelector('h4').textContent = variantsOfType[adsObject.offer.type];
   var paragraphOfElement = newElement.querySelectorAll('p');
   paragraphOfElement[2].textContent = adsObject.offer.rooms + ' комнаты для ' +
     adsObject.offer.guests + ' гостей';
@@ -288,7 +273,7 @@ mapMarker.appendChild(mapMarkerFragment);
 var mapCardFragment = document.createDocumentFragment();
 // Заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
 var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
-mapCardFragment.appendChild(createMapCardElement(adsArrayRandom[0], mapCardTemplate));
+mapCardFragment.appendChild(createMapCardElement(adsArrayRandom[0], mapCardTemplate, VARIANTS_OF.type));
 // Заменяем диалог на фрагмент
 var mapCard = document.querySelector('.map');
 var mapFiltersContainer = document.querySelector('.map__filters-container');
