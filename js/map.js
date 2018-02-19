@@ -305,7 +305,7 @@ mapMarker.appendChild(mapMarkersFragment);
 
 // Находим шаблон для карточки
 var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
-// Создаем и аполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
+// Создаем и заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
 var mapCardFragment = createMapCardElement(adsArrayRandom[0], mapCardTemplate, INITIAL_DATA.type);
 // Находим, куда засовывать фрагмент с диалогом
 var mapCard = document.querySelector('.map');
