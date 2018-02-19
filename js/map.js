@@ -2,14 +2,15 @@
 // Количество объявлений
 var ADS_QUANTITY = 8;
 
-// Смещения для нахождения кончика метки - противоречит заданию, но соответствует реальности, отсчет от центра
+// Смещения для нахождения кончика метки - противоречит заданию,
+// но соответствует реальности, отсчет от центра
 var MAP_MARKER_X_OFFSET = 0;
 var MAP_MARKER_Y_OFFSET = 35;
 
-// Здесь храним временные данные для генерации объявлений
-var VARIANTS_OF = {
-  avatarPartOne: 'img/avatars/user0',
-  avatarPartTwo: '.png',
+// Здесь храним исходные данные для генерации объявлений
+var INITIAL_DATA = {
+  avatarPathName: 'img/avatars/user0',
+  avatarExtension: '.png',
   title: [
     'Большая уютная квартира',
     'Маленькая неуютная квартира',
@@ -107,11 +108,13 @@ var generateAds = function (variantsOfObject, adsQuantity) {
   var locationX;
   var locationY;
   for (var i = 0; i < adsQuantity; i++) {
-    locationX = randomiseIntegerMinToMax(variantsOfObject.locationXMax, variantsOfObject.locationXMin);
-    locationY = randomiseIntegerMinToMax(variantsOfObject.locationYMin, variantsOfObject.locationYMax);
+    locationX = randomiseIntegerMinToMax(
+        variantsOfObject.locationXMax, variantsOfObject.locationXMin);
+    locationY = randomiseIntegerMinToMax(
+        variantsOfObject.locationYMin, variantsOfObject.locationYMax);
     adsArray[i] = {
       author: {
-        avatar: variantsOfObject.avatarPartOne + (i + 1) + variantsOfObject.avatarPartTwo
+        avatar: variantsOfObject.avatarPathName + (i + 1) + variantsOfObject.avatarExtension
       },
       offer: {
         title: variantsOfObject.title[i],
@@ -158,73 +161,81 @@ var setOrRemoveClassMapFaded = function (block, status) {
  * @return {IXMLDOMNode | Node} - баттан, который возвращается
  */
 var createMapMarkerElement = function (adObject, templateObject, offsetX, offsetY) {
-  var newMarkerButtonFromTemplate = templateObject.cloneNode(true);
-  newMarkerButtonFromTemplate.style.left = (adObject.location.x - offsetX) + 'px';
-  newMarkerButtonFromTemplate.style.top = (adObject.location.y - offsetY) + 'px';
-  var newMarkerButtonImageFromTemplate = newMarkerButtonFromTemplate.querySelector('img');
-  newMarkerButtonImageFromTemplate.setAttribute('src', adObject.author.avatar);
-  newMarkerButtonImageFromTemplate.setAttribute('width', '40');
-  newMarkerButtonImageFromTemplate.setAttribute('height', '40');
-  newMarkerButtonImageFromTemplate.setAttribute('draggable', 'false');
-  return newMarkerButtonFromTemplate;
+  // Задаем положение указателя со смещением
+  var button = templateObject.cloneNode(true);
+  button.style.left = (adObject.location.x - offsetX) + 'px';
+  button.style.top = (adObject.location.y - offsetY) + 'px';
+  // Цепляем картинку на указатель и задаем ей параметры
+  var image = button.querySelector('img');
+  image.setAttribute('src', adObject.author.avatar);
+  image.setAttribute('width', '40');
+  image.setAttribute('height', '40');
+  image.setAttribute('draggable', 'false');
+  return button;
 };
 
 /**
- * Функцию заполнения блока маркеров DOM-элементами на основе массива JS-объектов
+ * Функцию создает и заполняет блока маркеров DOM-элементами на основе массива JS-объектов
  * с применением шаблона
  * @param {array} ads - массив объектов объявлений
- * @param {object} domBlock - блок, куда все запкидываем
  * @param {object} templateBlock - блок шаблона, на основе которого мы создаем маркеры
  * @param {number} markerOffsetX - отступ маркера по оси Х
  * @param {number} markerOffsetY - отступ маркера по оси У
+ * @return {DocumentFragment} - возвращает заполненный DOM блок с маркерами
  */
-var fillMapFragmentByMarkersWithTemplate = function (ads, domBlock, templateBlock, markerOffsetX, markerOffsetY) {
-  for (var j = 0; j < ADS_QUANTITY; j++) {
-    domBlock.appendChild(createMapMarkerElement(ads[j], templateBlock, markerOffsetX, markerOffsetY));
+var createMapFragmentByMarkersWithTemplate = function (
+    ads, templateBlock, markerOffsetX, markerOffsetY) {
+  // Создаем блок
+  var domBlock = document.createDocumentFragment();
+  // Пишем в блок маркеры
+  for (var j = 0; j < ads.length; j++) {
+    domBlock.appendChild(createMapMarkerElement(
+        ads[j], templateBlock, markerOffsetX, markerOffsetY));
   }
+  return domBlock;
 };
 
 /**
- * функция генерации блока в стиле img из элемента списка картинок
- * @param {string} arrayElement - элемент массива
- * @return {HTMLImageElement} - возвращает блок для вставки в стиле списка
+ * Функция, заполняющая блок (из шаблона) элементами списка с картинками согласно исходному массиву
+ * @param {object} listBlock - Блок, в котором работаем, созданный на основе шаблона
+ * @param {array} picArray - Массив картинок, которыми заполняем блок
  */
-var generatePictureLi = function (arrayElement) {
-  var newElement = document.createElement('li').appendChild(document.createElement('img'));
-  newElement.setAttribute('src', arrayElement);
-  newElement.setAttribute('width', '70');
-  return newElement;
-};
-
-/**
- * Функция, которая берет блок и заполняет его элементамми из массива, применяя к ним функцию.
- * @param {object} listBlock - блок для заполнения
- * @param {array} array - массив
- * @param {function} specialFunction - специальная функция для обработки массива
- */
-var fillBlockByArrayWithFunction = function (listBlock, array, specialFunction) {
+var fillPopupPictureBlock = function (listBlock, picArray) {
+  // Запоминаем шаблон элемента списка
+  var liListElement = listBlock.querySelector('li');
+  // Зачищаем список для простоты, чтобы не заморачиваться с первым элементом и кучей if
   while (listBlock.firstChild) {
     listBlock.removeChild(listBlock.firstChild);
   }
-  for (var w = 0; w < array.length; w++) {
-    listBlock.appendChild(specialFunction(array[w]));
+  // Используюя ранее запомненный шаблон, заполняем список картинок
+  for (var i = 0; i < picArray.length; i++) {
+    var newLiListElement = liListElement.cloneNode(true);
+    newLiListElement.querySelector('img').setAttribute('src', picArray[i]);
+    newLiListElement.querySelector('img').setAttribute('width', '70');
+    listBlock.appendChild(newLiListElement);
   }
 };
 
 /**
- * Функция редактирования шаблона в зависимости от того, есть ли фичи в объявлении
- * @param {object} listBlock - блок в шаблоне в отором вносим корректировки
- * @param {array} array - массив фич, кторые нам надо отобразить
+ * Функция, отвчает на вопрос, есть ли нужный элемент в массиве
+ * @param {string} value - элемент, наличие которого мы проверяем
+ * @param {array} array - массив, в котором мы ищем элемент
+ * @return {boolean} - true or false, есть ли элемент в массиве или нет
+ */
+var isInArray = function (value, array) {
+  return array.indexOf(value) > -1;
+};
+/**
+ * Функция, удаляет из блока шаблона лишние LI в зависимости от наличия класса в array
+ * @param {object} listBlock - блок в котором работаем (шаблон) и удаляем лишнее
+ * @param {array} array - массив фич текущего объявления,
+ * согласно которому надо оставить или удалить
  */
 var fillPopupFeaturesBlock = function (listBlock, array) {
   var liList = listBlock.querySelectorAll('.feature');
-  for (var liIndex = 0; liIndex < liList.length; liIndex++) {
-    for (var arrIndex = 0; arrIndex < liList.length; arrIndex++) {
-      if (liList[liIndex].classList[1] === ('feature--' + array[arrIndex])) {
-        break;
-      } else if (arrIndex === liList.length - 1) {
-        listBlock.removeChild(liList[liIndex]);
-      }
+  for (var i = 0; i < liList.length; i++) {
+    if (!isInArray(liList[i].classList[1].split('--')[1], array)) {
+      listBlock.removeChild(liList[i]);
     }
   }
 };
@@ -237,27 +248,42 @@ var fillPopupFeaturesBlock = function (listBlock, array) {
  * @return {ActiveX.IXMLDOMNode | Node} - возвращает заполненный блок
  */
 var createMapCardElement = function (adsObject, template, variantsOfType) {
+  // Создаем блок для заполнения
+  var domBlock = document.createDocumentFragment();
+  // Копирумем шаблон
   var newElement = template.cloneNode(true);
+  // Правим заголовок
   newElement.querySelector('h3').textContent = adsObject.offer.title;
+  // Правим адрес
   newElement.querySelector('p small').textContent = adsObject.offer.address;
+  // Правим цену
   newElement.querySelector('.popup__price').textContent = adsObject.offer.price + ' ₽/ночь';
+  // Правим тим жилища
   newElement.querySelector('h4').textContent = variantsOfType[adsObject.offer.type];
+  // Ищем по 'p'
   var paragraphOfElement = newElement.querySelectorAll('p');
-  paragraphOfElement[2].textContent = adsObject.offer.rooms + ' комнаты для ' +
-    adsObject.offer.guests + ' гостей';
-  paragraphOfElement[3].textContent = 'Заезд после ' + adsObject.offer.checkin +
-    ', выезд до ' + adsObject.offer.checkout;
-  var listPopupFeatures = newElement.querySelector('.popup__features');
-  fillPopupFeaturesBlock(listPopupFeatures, adsObject.offer.features);
+  // Правим данные о комнатах и гостях
+  paragraphOfElement[2].textContent =
+    adsObject.offer.rooms + ' комнаты для ' + adsObject.offer.guests + ' гостей';
+  // Правим время заезда и выезда
+  paragraphOfElement[3].textContent =
+    'Заезд после ' + adsObject.offer.checkin + ', выезд до ' + adsObject.offer.checkout;
+  // Правим фичи
+  fillPopupFeaturesBlock(newElement.querySelector('.popup__features'), adsObject.offer.features);
+  // Правим описание
   paragraphOfElement[4].textContent = adsObject.offer.description;
-  fillBlockByArrayWithFunction(newElement.querySelector('.popup__pictures'), adsObject.offer.photos, generatePictureLi);
+  // Правим картинки
+  fillPopupPictureBlock(newElement.querySelector('.popup__pictures'), adsObject.offer.photos);
   // Меняе SRC....
   newElement.querySelector('.popup__avatar').setAttribute('src', adsObject.author.avatar);
-  return newElement;
+  // Аппендим все в дом элемент
+  domBlock.appendChild(newElement);
+  // Возвращаем дом элемент
+  return domBlock;
 };
 
 // Генерируем обявления
-var adsArrayRandom = generateAds(VARIANTS_OF, ADS_QUANTITY);
+var adsArrayRandom = generateAds(INITIAL_DATA, ADS_QUANTITY);
 
 // Активизируем карту
 var mapBlock = document.querySelector('.map');
@@ -266,21 +292,23 @@ setOrRemoveClassMapFaded(mapBlock, true);
 // находим шаблон
 var templateFragment = document.querySelector('template').content;
 
-// Создаем фрагмент для маркеров
-var mapMarkerFragment = document.createDocumentFragment();
+// Находим шаблон маркеров
 var mapMarketTemplateFragment = templateFragment.querySelector('.map__pin');
-// Заполняем фрагмент маркеров объявлениями
-fillMapFragmentByMarkersWithTemplate(adsArrayRandom, mapMarkerFragment, mapMarketTemplateFragment, MAP_MARKER_X_OFFSET, MAP_MARKER_Y_OFFSET);
-// Отрисовываем фрагмент там, где надо;)
-var mapMarker = mapBlock.querySelector('.map__pins');
-mapMarker.appendChild(mapMarkerFragment);
 
-// Создаем фрагмент для карточки
-var mapCardFragment = document.createDocumentFragment();
-// Заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
+// Создаем и заполняем фрагмент маркеров объявлениями
+var mapMarkersFragment = createMapFragmentByMarkersWithTemplate(
+    adsArrayRandom, mapMarketTemplateFragment, MAP_MARKER_X_OFFSET, MAP_MARKER_Y_OFFSET);
+// Находим, где отрисоовывать фрагмент маркеров
+var mapMarker = mapBlock.querySelector('.map__pins');
+// Отрисовываем маркеры там, где надо
+mapMarker.appendChild(mapMarkersFragment);
+
+// Находим шаблон для карточки
 var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
-mapCardFragment.appendChild(createMapCardElement(adsArrayRandom[0], mapCardTemplate, VARIANTS_OF.type));
-// Заменяем диалог на фрагмент
+// Создаем и аполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
+var mapCardFragment = createMapCardElement(adsArrayRandom[0], mapCardTemplate, INITIAL_DATA.type);
+// Находим, куда засовывать фрагмент с диалогом
 var mapCard = document.querySelector('.map');
 var mapFiltersContainer = document.querySelector('.map__filters-container');
+// Отрисовываем там, где надо
 mapCard.insertBefore(mapCardFragment, mapFiltersContainer);
