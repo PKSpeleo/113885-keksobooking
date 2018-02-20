@@ -346,13 +346,17 @@ var setOrRemoveClassNoticeFormDisabled = function (block, status) {
   }
 };
 
-// Деактивируем заполнение форм для начала
-// setOrRemoveAttributeDisable(noticeForm, true);
-
+/**
+ * Функция акивации и деактивации страницы
+ * @param {object} blockOfMap - блок карты
+ * @param {object} blockOfForm - блок формы
+ * @param {boolean} status - Если True - то видно, если False - то нет;)
+ */
 var setActiveOrInactivePage = function (blockOfMap, blockOfForm, status) {
   setOrRemoveClassMapFaded(blockOfMap, status);
   setOrRemoveClassNoticeFormDisabled(blockOfForm, status);
   setOrRemoveAttributeDisable(blockOfForm, status);
 };
 
+// Для начала делаем страницу неактивной.
 setActiveOrInactivePage(mapBlock, noticeForm, true);
