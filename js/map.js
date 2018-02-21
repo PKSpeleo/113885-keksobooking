@@ -7,6 +7,12 @@ var ADS_QUANTITY = 8;
 var MAP_MARKER_X_OFFSET = 0;
 var MAP_MARKER_Y_OFFSET = 35;
 
+// Коды клавиатуры
+var KEY_CODES = {
+  enter: 13,
+  esc: 27
+};
+
 // Здесь храним исходные данные для генерации объявлений
 var INITIAL_DATA = {
   avatarPathName: 'img/avatars/user0',
@@ -360,3 +366,29 @@ var setActiveOrInactivePage = function (blockOfMap, blockOfForm, status) {
 
 // Для начала делаем страницу неактивной.
 setActiveOrInactivePage(mapBlock, noticeForm, true);
+
+// Нахожим кнопку активации карты
+var buttonOfMapActivation = document.querySelector('.map__pin--main');
+
+/**
+ * Функция - обработчик события клика по кнопке
+ */
+var onButtonMouseup = function () {
+  setActiveOrInactivePage(mapBlock, noticeForm, false);
+};
+
+// Вешаем обработчик событий на клик по кнопке активации карты
+buttonOfMapActivation.addEventListener('mouseup', onButtonMouseup);
+
+/**
+ * Функция - обработчик события нажатия клавиши ENTER на кнопке активации карты
+ * @param {object} evt - объект с данными о собитии
+ */
+var onButtonKeydown = function (evt) {
+  if (evt.keyCode === KEY_CODES.enter) {
+    setActiveOrInactivePage(mapBlock, noticeForm, false);
+  }
+};
+
+// Вешаем обработчик на нажатие клавиши ENTER по кнопке активации карты
+buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
