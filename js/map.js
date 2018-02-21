@@ -4,8 +4,10 @@ var ADS_QUANTITY = 8;
 
 // Смещения для нахождения кончика метки - противоречит заданию,
 // но соответствует реальности, отсчет от центра
-var MAP_MARKER_X_OFFSET = 0;
-var MAP_MARKER_Y_OFFSET = 35;
+var MAP_MARKER_OFFSET = {
+  x: 0,
+  y: 35
+};
 
 // Коды клавиатуры
 var KEY_CODES = {
@@ -161,16 +163,18 @@ var setOrRemoveClassMapFaded = function (block, status) {
 /**
  * функцию создания DOM-элемента маркера на основе JS-объекта
  * @param {object} adObject - Объект с объявлением
+ * @param {number} index - индекс объявления (для идентификации маркера)
  * @param {object} templateObject - Объект с шаблоном
  * @param {number} offsetX - отступ стрелки маркера по оси Х
  * @param {number} offsetY - отступ стрелки маркера по оси У
  * @return {IXMLDOMNode | Node} - баттан, который возвращается
  */
-var createMapMarkerElement = function (adObject, templateObject, offsetX, offsetY) {
+var createMapMarkerElement = function (adObject, index, templateObject, offsetX, offsetY) {
   // Задаем положение указателя со смещением
   var button = templateObject.cloneNode(true);
   button.style.left = (adObject.location.x - offsetX) + 'px';
   button.style.top = (adObject.location.y - offsetY) + 'px';
+  button.dataset.addId = index;
   // Цепляем картинку на указатель и задаем ей параметры
   var image = button.querySelector('img');
   image.setAttribute('src', adObject.author.avatar);
@@ -185,18 +189,17 @@ var createMapMarkerElement = function (adObject, templateObject, offsetX, offset
  * с применением шаблона
  * @param {array} ads - массив объектов объявлений
  * @param {object} templateBlock - блок шаблона, на основе которого мы создаем маркеры
- * @param {number} markerOffsetX - отступ маркера по оси Х
- * @param {number} markerOffsetY - отступ маркера по оси У
+ * @param {object} markerOffset - отступ маркера по оси Х и Y в объекте
  * @return {DocumentFragment} - возвращает заполненный DOM блок с маркерами
  */
 var createMapFragmentByMarkersWithTemplate = function (
-    ads, templateBlock, markerOffsetX, markerOffsetY) {
+    ads, templateBlock, markerOffset) {
   // Создаем блок
   var domBlock = document.createDocumentFragment();
   // Пишем в блок маркеры
   for (var j = 0; j < ads.length; j++) {
     domBlock.appendChild(createMapMarkerElement(
-        ads[j], templateBlock, markerOffsetX, markerOffsetY));
+        ads[j], j, templateBlock, markerOffset.x, markerOffset.y));
   }
   return domBlock;
 };
@@ -291,7 +294,6 @@ var createMapCardElement = function (adsObject, template, variantsOfType) {
 // Генерируем обявления
 var adsArrayRandom = generateAds(INITIAL_DATA, ADS_QUANTITY);
 
-// Активизируем карту
 var mapBlock = document.querySelector('.map');
 // setOrRemoveClassMapFaded(mapBlock, true);
 
@@ -301,23 +303,8 @@ var templateFragment = document.querySelector('template').content;
 // Находим шаблон маркеров
 var mapMarketTemplateFragment = templateFragment.querySelector('.map__pin');
 
-// Создаем и заполняем фрагмент маркеров объявлениями
-var mapMarkersFragment = createMapFragmentByMarkersWithTemplate(
-    adsArrayRandom, mapMarketTemplateFragment, MAP_MARKER_X_OFFSET, MAP_MARKER_Y_OFFSET);
 // Находим, где отрисоовывать фрагмент маркеров
 var mapMarker = mapBlock.querySelector('.map__pins');
-// Отрисовываем маркеры там, где надо
-// mapMarker.appendChild(mapMarkersFragment);
-
-// Находим шаблон для карточки
-var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
-// Создаем и заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
-var mapCardFragment = createMapCardElement(adsArrayRandom[0], mapCardTemplate, INITIAL_DATA.type);
-// Находим, куда засовывать фрагмент с диалогом
-var mapCard = document.querySelector('.map');
-var mapFiltersContainer = document.querySelector('.map__filters-container');
-// Отрисовываем там, где надо
-// mapCard.insertBefore(mapCardFragment, mapFiltersContainer);
 
 // Находмм где у нас формы
 var noticeForm = document.querySelector('.notice__form');
@@ -362,23 +349,34 @@ var setActiveOrInactivePage = function (blockOfMap, blockOfForm, status) {
   setOrRemoveClassMapFaded(blockOfMap, status);
   setOrRemoveClassNoticeFormDisabled(blockOfForm, status);
   setOrRemoveAttributeDisable(blockOfForm, status);
+  if (!status) {
+    // Создаем и заполняем фрагмент маркеров объявлениями
+    var mapMarkersFragment = createMapFragmentByMarkersWithTemplate(
+        adsArrayRandom, mapMarketTemplateFragment, MAP_MARKER_OFFSET);
+    // Отрисовываем маркеры там, где надо
+    mapMarker.appendChild(mapMarkersFragment);
+    // Обходим одновременный mousdown и click от перетаскивания маркера
+    setTimeout(setEventListenerToClickOnMap, 1000);
+  }
 };
 
-// Для начала делаем страницу неактивной.
-setActiveOrInactivePage(mapBlock, noticeForm, true);
-
-// Нахожим кнопку активации карты
+// Находим кнопку активации карты
 var buttonOfMapActivation = document.querySelector('.map__pin--main');
+
 
 /**
  * Функция - обработчик события клика по кнопке
+ * @param {object} evt - объектс с данными о событии
  */
-var onButtonMouseup = function () {
+var onButtonMouseup = function (evt) {
   setActiveOrInactivePage(mapBlock, noticeForm, false);
+  // прописываем в поле адрес положение мышки в момент клика
+  addressField.setAttribute(
+      'value', evt.pageX + ' , ' + evt.pageY);
+  // Удаляем обработчики
+  buttonOfMapActivation.removeEventListener('mouseup', onButtonMouseup);
+  buttonOfMapActivation.removeEventListener('keydown', onButtonKeydown);
 };
-
-// Вешаем обработчик событий на клик по кнопке активации карты
-buttonOfMapActivation.addEventListener('mouseup', onButtonMouseup);
 
 /**
  * Функция - обработчик события нажатия клавиши ENTER на кнопке активации карты
@@ -387,8 +385,58 @@ buttonOfMapActivation.addEventListener('mouseup', onButtonMouseup);
 var onButtonKeydown = function (evt) {
   if (evt.keyCode === KEY_CODES.enter) {
     setActiveOrInactivePage(mapBlock, noticeForm, false);
+    // Удаляем обработчики
+    buttonOfMapActivation.removeEventListener('mouseup', onButtonMouseup);
+    buttonOfMapActivation.removeEventListener('keydown', onButtonKeydown);
   }
 };
 
+// Для начала делаем страницу неактивной.
+setActiveOrInactivePage(mapBlock, noticeForm, true);
+
+// Находим поле ядреса
+var addressField = document.querySelector('#address');
+// Прописываем начальный адрес
+document.querySelector('#address').setAttribute('value', '600, 375');
+
 // Вешаем обработчик на нажатие клавиши ENTER по кнопке активации карты
 buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
+
+// Вешаем обработчик событий на клик по кнопке активации карты
+buttonOfMapActivation.addEventListener('mouseup', onButtonMouseup);
+
+
+// Находим шаблон для карточки
+var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
+
+/**
+ * Функция - обработчик клика по карте, в поисках клика по метке или картинки в метке
+ * @param {object} evt - объект с данными о собитии
+ */
+var onMapClick = function (evt) {
+  // Спрашиваем, а кнопка ли это (в нее тыкаем или в катинку, которая в ней)
+  if (evt.target.tagName === 'BUTTON' || evt.target.parentNode.tagName === 'BUTTON') {
+    // Вытаскиваем номер объявления из атрибутов кнопки;)
+    var addIndex = evt.target.dataset.addId || evt.target.parentNode.dataset.addId;
+    // Создаем и заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
+    var mapCardFragment = createMapCardElement(adsArrayRandom[addIndex], mapCardTemplate, INITIAL_DATA.type);
+    // Находим, куда засовывать фрагмент с диалогом
+    var mapCard = document.querySelector('.map');
+    var mapFiltersContainer = document.querySelector('.map__filters-container');
+    // Проверяем, открыта ли карточка. Если открыта, то удаляем перед отрисовкой новой.
+    if (mapCard.querySelector('.popup')) {
+      mapCard.removeChild(mapCard.querySelector('.popup'));
+    }
+    // Отрисовываем там, где надо
+    mapCard.insertBefore(mapCardFragment, mapFiltersContainer);
+  }
+};
+
+/**
+ * Функция, которая ставит обработчик событий на клик по карте в поисках клика
+ * указателе объявления
+ * Отлельно так - чтобы сделать задержку, чтобы не было клика сразу после маусдаун.
+ */
+var setEventListenerToClickOnMap = function () {
+  mapBlock.addEventListener('click', onMapClick);
+};
