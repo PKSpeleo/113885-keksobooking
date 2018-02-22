@@ -174,7 +174,7 @@ var createMapMarkerElement = function (adObject, index, templateObject, offsetX,
   var button = templateObject.cloneNode(true);
   button.style.left = (adObject.location.x - offsetX) + 'px';
   button.style.top = (adObject.location.y - offsetY) + 'px';
-  button.dataset.addId = index;
+  button.dataset.addId = index.toString();
   // Цепляем картинку на указатель и задаем ей параметры
   var image = button.querySelector('img');
   image.setAttribute('src', adObject.author.avatar);
@@ -340,6 +340,17 @@ var setOrRemoveClassNoticeFormDisabled = function (block, status) {
 };
 
 /**
+ * Функция обработчика события нажатия кнопки ESC - акрывает карточку
+ * @param {object} evt - объектс с данными о событии
+ */
+var onDocumentKeydown = function (evt) {
+  if (evt.keyCode === KEY_CODES.esc) {
+    mapBlock.removeChild(mapBlock.querySelector('.popup'));
+    document.removeEventListener('keydown', onDocumentKeydown);
+  }
+};
+
+/**
  * Функция акивации и деактивации страницы
  * @param {object} blockOfMap - блок карты
  * @param {object} blockOfForm - блок формы
@@ -355,8 +366,8 @@ var setActiveOrInactivePage = function (blockOfMap, blockOfForm, status) {
         adsArrayRandom, mapMarketTemplateFragment, MAP_MARKER_OFFSET);
     // Отрисовываем маркеры там, где надо
     mapMarker.appendChild(mapMarkersFragment);
-    // Обходим одновременный mousdown и click от перетаскивания маркера
-    setTimeout(setEventListenerToClickOnMap, 1000);
+    // Вешаем обработчик клика по карте в поисках метки
+    mapBlock.addEventListener('click', onMapClick);
   }
 };
 
@@ -405,7 +416,6 @@ buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
 // Вешаем обработчик событий на клик по кнопке активации карты
 buttonOfMapActivation.addEventListener('mouseup', onButtonMouseup);
 
-
 // Находим шаблон для карточки
 var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
 
@@ -415,28 +425,30 @@ var mapCardTemplate = document.querySelector('template').content.querySelector('
  */
 var onMapClick = function (evt) {
   // Спрашиваем, а кнопка ли это (в нее тыкаем или в катинку, которая в ней)
-  if (evt.target.tagName === 'BUTTON' || evt.target.parentNode.tagName === 'BUTTON') {
+  if (evt.target.className === 'map__pin' || evt.target.parentNode.className === 'map__pin') {
     // Вытаскиваем номер объявления из атрибутов кнопки;)
     var addIndex = evt.target.dataset.addId || evt.target.parentNode.dataset.addId;
     // Создаем и заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
     var mapCardFragment = createMapCardElement(adsArrayRandom[addIndex], mapCardTemplate, INITIAL_DATA.type);
     // Находим, куда засовывать фрагмент с диалогом
-    var mapCard = document.querySelector('.map');
     var mapFiltersContainer = document.querySelector('.map__filters-container');
     // Проверяем, открыта ли карточка. Если открыта, то удаляем перед отрисовкой новой.
-    if (mapCard.querySelector('.popup')) {
-      mapCard.removeChild(mapCard.querySelector('.popup'));
+    // Удаляем из отображения, а уже ПОТОМ отрисовываем карточку (код ниже)
+
+    if (mapBlock.querySelector('.popup')) {
+      mapBlock.removeChild(mapBlock.querySelector('.popup'));
     }
     // Отрисовываем там, где надо
-    mapCard.insertBefore(mapCardFragment, mapFiltersContainer);
+    mapBlock.insertBefore(mapCardFragment, mapFiltersContainer);
+    // Вешаем обработчик на клавишу ESC по всей карте
+    document.addEventListener('keydown', onDocumentKeydown);
+
+  } else if (evt.target.className === 'popup__close') {
+    // Если кликнули по кнопке закрытия карточки - удаляем ее
+    mapBlock.removeChild(mapBlock.querySelector('.popup'));
+    // Удаляем обработчик нажатия на ESC
+    document.removeEventListener('keydown', onDocumentKeydown);
   }
 };
 
-/**
- * Функция, которая ставит обработчик событий на клик по карте в поисках клика
- * указателе объявления
- * Отлельно так - чтобы сделать задержку, чтобы не было клика сразу после маусдаун.
- */
-var setEventListenerToClickOnMap = function () {
-  mapBlock.addEventListener('click', onMapClick);
-};
+
