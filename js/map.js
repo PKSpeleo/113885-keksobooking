@@ -424,7 +424,7 @@ var mapCardTemplate = document.querySelector('template').content.querySelector('
  * @param {object} evt - объект с данными о собитии
  */
 var onMapClick = function (evt) {
-  // Спрашиваем, а кнопка ли это (в нее тыкаем или в катинку, которая в ней)
+  // Спрашиваем, а ярлычек ли это (в него тыкаем или в картинку, которая в ней)
   if (evt.target.className === 'map__pin' || evt.target.parentNode.className === 'map__pin') {
     // Вытаскиваем номер объявления из атрибутов кнопки;)
     var addIndex = evt.target.dataset.addId || evt.target.parentNode.dataset.addId;
