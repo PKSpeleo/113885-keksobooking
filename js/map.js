@@ -185,7 +185,7 @@ var createMapMarkerElement = function (adObject, index, templateObject, offsetX,
 };
 
 /**
- * Функцию создает и заполняет блока маркеров DOM-элементами на основе массива JS-объектов
+ * Функция создает и заполняет блок маркеров DOM-элементами на основе массива JS-объектов
  * с применением шаблона
  * @param {array} ads - массив объектов объявлений
  * @param {object} templateBlock - блок шаблона, на основе которого мы создаем маркеры
@@ -249,7 +249,7 @@ var fillPopupFeaturesBlock = function (listBlock, array) {
   }
 };
 /**
- * функуия создает DOM элемент карточки на основе JS объекта, шаблона
+ * Функция создает DOM элемент карточки на основе JS объекта, шаблона
  * и вариантов перевода;_
  * @param {object} adsObject - объкт объявления
  * @param {object} template - шаблон
