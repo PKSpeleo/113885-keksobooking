@@ -425,6 +425,8 @@ var mapCardTemplate = document.querySelector('template').content.querySelector('
  */
 var onMapClick = function (evt) {
   // Спрашиваем, а ярлычек ли это (в него тыкаем или в картинку, которая в ней)
+  // Плюс убиваем второго зайца - отбиваемся от 'click' идущем сразу за 'mousedown':)
+  // Это вместо preventDefault
   if (evt.target.className === 'map__pin' || evt.target.parentNode.className === 'map__pin') {
     // Вытаскиваем номер объявления из атрибутов кнопки;)
     var addIndex = evt.target.dataset.addId || evt.target.parentNode.dataset.addId;
