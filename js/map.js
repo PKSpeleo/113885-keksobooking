@@ -438,11 +438,14 @@ var onMapClick = function (evt) {
   // Спрашиваем, а ярлычек ли это (в него тыкаем или в картинку, которая в ней)
   // Плюс убиваем второго зайца - отбиваемся от 'click' идущем сразу за 'mousedown':)
   // Это вместо preventDefault
-  if (evt.target.className === 'map__pin' || evt.target.parentNode.className === 'map__pin') {
+  if (evt.target.className === 'map__pin' ||
+    evt.target.parentNode.className === 'map__pin') {
     // Вытаскиваем номер объявления из атрибутов кнопки;)
-    var addIndex = evt.target.dataset.addId || evt.target.parentNode.dataset.addId;
+    var addIndex = evt.target.dataset.addId ||
+      evt.target.parentNode.dataset.addId;
     // Создаем и заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
-    var mapCardFragment = createMapCardElement(adsArrayRandom[addIndex], mapCardTemplate, FlatType.TRANSLATE);
+    var mapCardFragment = createMapCardElement(
+        adsArrayRandom[addIndex], mapCardTemplate, FlatType.TRANSLATE);
     // Находим, куда засовывать фрагмент с диалогом
     var mapFiltersContainer = document.querySelector('.map__filters-container');
     // Проверяем, открыта ли карточка. Если открыта, то удаляем перед отрисовкой новой.
@@ -464,34 +467,76 @@ var onMapClick = function (evt) {
   }
 };
 
-var noticeFormBlock = document.querySelector('.notice');
-
-var checkNoticeForm = function (blockDom, flatMapa) {
+/**
+ * Функция проверки и подготовки формы к работе
+ * @param {object} blockDom - блок с формой
+ * @param {object} flatMapa - объект с мапой по типам жилищь
+ */
+var checkAndChangeNoticeForm = function (blockDom, flatMapa) {
+  // Где же заголовок?
   var titleField = blockDom.querySelector('#title');
+  // Правим атрибуты заголовка
   titleField.setAttribute('required', '');
   titleField.setAttribute('minlength', '30');
   titleField.setAttribute('maxlength', '100');
+
+  // Где же поле цены?
   var priceInput = blockDom.querySelector('#price');
+  // Правим статичные атрибуты цены
   priceInput.setAttribute('required', '');
   priceInput.setAttribute('max', '1000000');
+  // Где же тип жилья?
   var typeField = blockDom.querySelector('#type');
   priceInput.setAttribute('min', flatMapa[typeField.value]);
+  /**
+   * Функция - обработчик собитыия на изменения в поле тип жилья
+   */
   var onTypeFieldChange = function () {
+    // Меняем атрибут минимальноей цены согласно мапе
     priceInput.setAttribute('min', flatMapa[typeField.value]);
   };
+  // Добавляем обработчик события на изменение поля тип жилья
   typeField.addEventListener('change', onTypeFieldChange);
+
+  // Где же адрес? Там ставим статичные атрибуты
   blockDom.querySelector('#address').setAttribute('readonly', '');
+
+  // Где же поле времени заезды и его варинты?
   var timeinField = blockDom.querySelector('#timein');
   var timeinFieldVariants = timeinField.querySelectorAll('option');
   var timeoutField = blockDom.querySelector('#timeout');
   var timeoutFieldsVariants = timeoutField.querySelectorAll('option');
+  /**
+   * Функция добавляет обработчик события изменений в двух полях
+   * времени заезда и выезда и их связывание
+   * согласно тз, согласно ведущему и ведомогу полю
+   * Раделение на ведущее и ведомое для того, чтобы использовать эту функцию
+   * для навешивания на кажое поле в отдельности, задавая параметры
+   * @param {object} masterBlock - Первое поле (Ведущее)
+   * @param {object} masterBlockVariants - Варианты первого поля (Ведущего)
+   * @param {object} slaveBlock - Второе поле (Ведомое)
+   * @param {object} slaveBlockVariants - Варианты второго поля (Ведомого)
+   */
   var addMutualChangeListener = function (masterBlock, masterBlockVariants, slaveBlock, slaveBlockVariants) {
+    /**
+     * Собственно сама функция - обработчик события изменения поля
+     */
     var onTimeFieldsChange = function () {
+      // Берем за основу время, выбранное в данном поле
       var actualTimeToSet = masterBlock.value;
+      /**
+       * Функция проставляет атрибут selected там где надо, где не надо - убирает
+       * а также принудительно проставляет value у поля
+       * @param {object} block - блок с полем
+       * @param {object} blockVariants - массив боорками с вариантами этого поля
+       * @param {string} time - время которе проставляем
+       */
       var setSelectedAttributeAndValue = function (block, blockVariants, time) {
+        // Убарем у всех вариантов полей атрибут selected от греха подальше, дабы не глучило;)
         blockVariants.forEach(function (value) {
           value.removeAttribute('selected');
         });
+        // А тут проставляем атрибут selected там где надо и насильно присваиваем value, дабы не глучило;)
         blockVariants.forEach(function (value) {
           if (value.getAttribute('value') === time) {
             value.setAttribute('selected', '');
@@ -499,59 +544,119 @@ var checkNoticeForm = function (blockDom, flatMapa) {
           }
         });
       };
+      // Проходимся по ведущему полю, меняем на текущее значение, правим атрибуты, ставим value
       setSelectedAttributeAndValue(masterBlock, masterBlockVariants, actualTimeToSet);
+      // Проходимся по ведомомн полю, меняем на текущее значение, правим атрибуты, ставим value
       setSelectedAttributeAndValue(slaveBlock, slaveBlockVariants, actualTimeToSet);
     };
+    // Навешиваем обработчик событий
     masterBlock.addEventListener('change', onTimeFieldsChange);
   };
-  addMutualChangeListener(timeinField, timeinFieldVariants, timeoutField, timeoutFieldsVariants);
-  addMutualChangeListener(timeoutField, timeoutFieldsVariants, timeinField, timeinFieldVariants);
+  // Навешиваем обработчик на изменения в поле timeIn
+  addMutualChangeListener(
+      timeinField, timeinFieldVariants, timeoutField, timeoutFieldsVariants);
+  // Навешиваем обработчик на изменения в поле timeOut
+  addMutualChangeListener(
+      timeoutField, timeoutFieldsVariants, timeinField, timeinFieldVariants);
+
+  // Где же у нас комнаты и вместимость?
   var roomNumberField = blockDom.querySelector('#room_number');
   var roomNumberVariants = roomNumberField.querySelectorAll('option');
   var capacityField = blockDom.querySelector('#capacity');
   var capacityFieldVariants = capacityField.querySelectorAll('option');
+  // Мапа для вместимости комнат
   var ROOM_TO_CAPACITY = {
     '1': [1],
     '2': [1, 2],
     '3': [1, 2, 3],
     '100': [0]
   };
+  // Прописываем статичные атрибуты
   capacityField.setAttribute('required', '');
+  // Для порядка делаем value пустым, чтобы обязать его заполнить выбрав вариант
   capacityField.value = '';
+  // Прописываем статичные атрибуты
   roomNumberField.setAttribute('required', '');
+  // Для порядка делаем value пустым, чтобы обязать его заполнить выбрав вариант
   roomNumberField.value = '';
-  var addMutualChangeListenerForRoomsAndCapacity = function (
+  /**
+   * Функция навешивает обработчик на изменения в поле мастер
+   * и корректирует видимости вариантов согласно мапе
+   * Структура странная, была идея одна, но потом она превратилась в другую,
+   * а струтура "симметричности" функции оставил, хотя она так и не работает
+   * @param {object} masterBlock - Вудущиий блок - количество комнат
+   * @param {object} masterBlockVariants - массив объектов вариантов количества комнат
+   * @param {object} slaveBlock - Ведомый блок - количество гостей
+   * @param {object} slaveBlockVariants - массив объектов варинтов количества гостей
+   */
+  var addChangeListenerForRoomsAndCapacity = function (
       masterBlock, masterBlockVariants, slaveBlock, slaveBlockVariants) {
-    var onRoomsOrCapacityFieldsChange = function () {
+    /**
+     * Функция - обработчик события внесения изменений в поле количества комнат
+     */
+    var onRoomsFieldsChange = function () {
+      // Берем за базу - выбранное значение
       var actualToSet = masterBlock.value;
-      var setSelectedAttributeAndValue = function (block, blockVariants, block2, block2Variants, valueToSet) {
+      /**
+       * Функция, которая проставляет атрибуты selected и disabled согласно ТЗ.
+       * Заодно принудительно проставляет value то со значением то с пустым значением
+       * Функция сумасшедшая! Сам ее понимаю на уровне подсознания;) Но работает отлично;)
+       * Зато "симметричная";)
+       * @param {object} block - Поле которе правим
+       * @param {object} blockVariants - Массив объектов возможных значений полей
+       * @param {string} valueToSet - Значение от которого отталкиваемся
+       */
+      var setSelectedAttributeAndValue = function (block, blockVariants, valueToSet) {
+        // Зачищаем атрибут selected на всякий пожарный
         blockVariants.forEach(function (value) {
           value.removeAttribute('selected');
         });
+        // А туууут... Выствляем нужные значения;) value, selected, disabled
         blockVariants.forEach(function (value) {
-          debugger;
-          if ((value.getAttribute('value') === valueToSet) && (block.getAttribute('id') === 'room_number')) {
+          // Если это про количество комнат и оно равно нужному то...
+          if ((value.getAttribute('value') === valueToSet) &&
+            (block.getAttribute('id') === 'room_number')) {
+            // Добавляем атрибут selected
             value.setAttribute('selected', '');
+            // И принудительно ставим value
             block.value = valueToSet;
+            // Если это про вместимость гостей...
           } else if (block.getAttribute('id') === 'capacity') {
+            // И это тот самы вариант, который подходит согласно мапе
             if (ROOM_TO_CAPACITY[valueToSet].includes(parseInt(value.value, 10))) {
+              // То даем возможность его выбирать
               value.removeAttribute('disabled');
-              console.log(ROOM_TO_CAPACITY[valueToSet]);
             } else {
+              // А если не то - то не даем;)
               value.setAttribute('disabled', '');
             }
           }
         });
+        // Принудительно сбрасываем, чтобы не выбирать за пользователя, а ему напомнит валидация
         slaveBlock.value = '';
       };
-      setSelectedAttributeAndValue(masterBlock, masterBlockVariants, slaveBlock, slaveBlockVariants, actualToSet);
-      setSelectedAttributeAndValue(slaveBlock, slaveBlockVariants, masterBlock, masterBlockVariants, actualToSet);
-      // setSelectedAttributeAndValue(slaveBlock, slaveBlockVariants, actualToSet);
+      // Обрабатываем поле с количеством комнат хитрой "симметричной" функцией
+      setSelectedAttributeAndValue(
+          masterBlock, masterBlockVariants, actualToSet);
+      // А теперь обрабатываем поле количества гостей той же хихитрой функцией;)
+      setSelectedAttributeAndValue(
+          slaveBlock, slaveBlockVariants, actualToSet);
     };
-    masterBlock.addEventListener('change', onRoomsOrCapacityFieldsChange);
+    // Навешиваем обработчик событий на изменения в поле количества комнат
+    masterBlock.addEventListener('change', onRoomsFieldsChange);
   };
-  addMutualChangeListenerForRoomsAndCapacity(roomNumberField, roomNumberVariants, capacityField, capacityFieldVariants);
-  // addMutualChangeListenerForRoomsAndCapacity(capacityField, capacityFieldVariants, roomNumberField, roomNumberVariants);
+  // Функция, навешивающая изменения в поле количесва комнат
+  addChangeListenerForRoomsAndCapacity(
+      roomNumberField, roomNumberVariants, capacityField, capacityFieldVariants);
+
+  // А эти строчки, чтобы форма отправлялась в адресную строчку, чтобы можно было проверить;)
+  blockDom.querySelector('form').setAttribute('action', '/123.txt');
+  blockDom.querySelector('form').setAttribute('method', 'get');
 };
-checkNoticeForm(noticeFormBlock, FlatType.PRICE_MIN);
+
+// Находим, где же форма
+var noticeFormBlock = document.querySelector('.notice');
+
+// Проверяем, правим форму!
+checkAndChangeNoticeForm(noticeFormBlock, FlatType.PRICE_MIN);
 
