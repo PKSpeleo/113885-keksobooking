@@ -506,7 +506,48 @@ var checkNoticeForm = function (blockDom, flatMapa) {
   };
   addMutualChangeListener(timeinField, timeinFieldVariants, timeoutField, timeoutFieldsVariants);
   addMutualChangeListener(timeoutField, timeoutFieldsVariants, timeinField, timeinFieldVariants);
-
+  var roomNumberField = blockDom.querySelector('#room_number');
+  var roomNumberVariants = roomNumberField.querySelectorAll('option');
+  var capacityField = blockDom.querySelector('#capacity');
+  var capacityFieldVariants = capacityField.querySelectorAll('option');
+  var ROOM_TO_CAPACITY = {
+    '1': [1],
+    '2': [1, 2],
+    '3': [1, 2, 3],
+    '100': [0]
+  };
+  capacityField.setAttribute('required', '');
+  capacityField.value = '';
+  roomNumberField.setAttribute('required', '');
+  roomNumberField.value = '';
+  var addMutualChangeListenerForRoomsAndCapacity = function (
+      masterBlock, masterBlockVariants, slaveBlock, slaveBlockVariants) {
+    var onRoomsOrCapacityFieldsChange = function () {
+      var actualToSet = masterBlock.value;
+      var setSelectedAttributeAndValue = function (block, blockVariants, block2, block2Variants, valueToSet) {
+        blockVariants.forEach(function (value) {
+          value.removeAttribute('selected');
+        });
+        blockVariants.forEach(function (value) {
+          if ((value.getAttribute('value') === valueToSet) && (block.getAttribute('id') === 'room_number')) {
+            value.setAttribute('selected', '');
+            block.value = valueToSet;
+          } else if (block.getAttribute('id') === 'capacity') {
+            debugger;
+            if (ROOM_TO_CAPACITY[valueToSet].includes(parseInt(value.value, 10))) {
+              debugger;
+              console.log(ROOM_TO_CAPACITY[valueToSet]);
+            }
+          }
+        });
+      };
+      setSelectedAttributeAndValue(masterBlock, masterBlockVariants, slaveBlock, slaveBlockVariants, actualToSet);
+      setSelectedAttributeAndValue(slaveBlock, slaveBlockVariants, masterBlock, masterBlockVariants, actualToSet);
+      // setSelectedAttributeAndValue(slaveBlock, slaveBlockVariants, actualToSet);
+    };
+    masterBlock.addEventListener('change', onRoomsOrCapacityFieldsChange);
+  };
+  addMutualChangeListenerForRoomsAndCapacity(roomNumberField, roomNumberVariants, capacityField, capacityFieldVariants);
 };
 checkNoticeForm(noticeFormBlock, FlatType.PRICE_MIN);
 
