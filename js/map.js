@@ -15,6 +15,21 @@ var KEY_CODES = {
   esc: 27
 };
 
+// Мапа для типов жидищь
+var FlatType = {
+  TRANSLATE: {
+    flat: 'Квартира',
+    house: 'Дом',
+    bungalo: 'Бунгало'
+  },
+  PRICE_MIN: {
+    flat: 1000,
+    bungalo: 0,
+    house: 5000,
+    palace: 10000
+  }
+};
+
 // Здесь храним исходные данные для генерации объявлений
 var INITIAL_DATA = {
   avatarPathName: 'img/avatars/user0',
@@ -32,11 +47,6 @@ var INITIAL_DATA = {
   addressSeparator: ', ',
   priceMin: 1000,
   priceMax: 1000000,
-  type: {
-    flat: 'Квартира',
-    house: 'Дом',
-    bungalo: 'Бунгало'
-  },
   roomsMin: 1,
   roomsMax: 5,
   guestsMin: 1,
@@ -108,10 +118,11 @@ var mixArrayRandomly = function (array) {
 /**
  * Функция создания массива объектов объявлений с данными
  * @param {object} variantsOfObject - объект с вариантами содержимого объявлений
+ * @param {object} FlatTypeMapa - мапа для типов илищь
  * @param {number} adsQuantity - количество объявлений
  * @return {Array} - возвращает массив объектов объявлений
  */
-var generateAds = function (variantsOfObject, adsQuantity) {
+var generateAds = function (variantsOfObject, FlatTypeMapa, adsQuantity) {
   var adsArray = [];
   var locationX;
   var locationY;
@@ -128,7 +139,7 @@ var generateAds = function (variantsOfObject, adsQuantity) {
         title: variantsOfObject.title[i],
         address: locationX + variantsOfObject.addressSeparator + locationY,
         price: randomiseIntegerMinToMax(variantsOfObject.priceMin, variantsOfObject.priceMax),
-        type: chooseRandomArrElement(Object.keys(variantsOfObject.type)),
+        type: chooseRandomArrElement(Object.keys(FlatTypeMapa.TRANSLATE)),
         rooms: randomiseIntegerMinToMax(variantsOfObject.roomsMin, variantsOfObject.roomsMax),
         guests: randomiseIntegerMinToMax(variantsOfObject.guestsMin, variantsOfObject.guestsMax),
         checkin: chooseRandomArrElement(variantsOfObject.checkinCheckout),
@@ -292,7 +303,7 @@ var createMapCardElement = function (adsObject, template, variantsOfType) {
 };
 
 // Генерируем обявления
-var adsArrayRandom = generateAds(INITIAL_DATA, ADS_QUANTITY);
+var adsArrayRandom = generateAds(INITIAL_DATA, FlatType, ADS_QUANTITY);
 
 var mapBlock = document.querySelector('.map');
 // setOrRemoveClassMapFaded(mapBlock, true);
@@ -431,7 +442,7 @@ var onMapClick = function (evt) {
     // Вытаскиваем номер объявления из атрибутов кнопки;)
     var addIndex = evt.target.dataset.addId || evt.target.parentNode.dataset.addId;
     // Создаем и заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
-    var mapCardFragment = createMapCardElement(adsArrayRandom[addIndex], mapCardTemplate, INITIAL_DATA.type);
+    var mapCardFragment = createMapCardElement(adsArrayRandom[addIndex], mapCardTemplate, FlatType.TRANSLATE);
     // Находим, куда засовывать фрагмент с диалогом
     var mapFiltersContainer = document.querySelector('.map__filters-container');
     // Проверяем, открыта ли карточка. Если открыта, то удаляем перед отрисовкой новой.
@@ -453,4 +464,48 @@ var onMapClick = function (evt) {
   }
 };
 
+var noticeFormBlock = document.querySelector('.notice');
+
+var checkNoticeForm = function (blockDom, flatMapa) {
+  var titleField = blockDom.querySelector('#title');
+  titleField.setAttribute('required', '');
+  titleField.setAttribute('minlength', '30');
+  titleField.setAttribute('maxlength', '100');
+  var priceInput = blockDom.querySelector('#price');
+  priceInput.setAttribute('required', '');
+  priceInput.setAttribute('max', '1000000');
+  var typeField = blockDom.querySelector('#type');
+  var onTypeFieldChange = function () {
+    priceInput.setAttribute('min', flatMapa[typeField.value]);
+  };
+  typeField.addEventListener('change', onTypeFieldChange);
+  blockDom.querySelector('#address').setAttribute('readonly', '');
+  var timeinField = blockDom.querySelector('#timein');
+  var timeinFieldVariants = timeinField.querySelectorAll('option');
+  var timeoutField = blockDom.querySelector('#timeout');
+  var timeoutFieldsVariants = timeoutField.querySelectorAll('option');
+  var addMutualChangeListener = function (masterBlock, masterBlockVariants, slaveBlock, slaveBlockVariants) {
+    var onTimeFieldsChange = function () {
+      var actualTimeToSet = masterBlock.value;
+      var setSelectedAttributeAndValue = function (block, blockVariants, time) {
+        blockVariants.forEach(function (value) {
+          value.removeAttribute('selected');
+        });
+        blockVariants.forEach(function (value) {
+          if (value.getAttribute('value') === time) {
+            value.setAttribute('selected', '');
+            block.value = time;
+          }
+        });
+      };
+      setSelectedAttributeAndValue(masterBlock, masterBlockVariants, actualTimeToSet);
+      setSelectedAttributeAndValue(slaveBlock, slaveBlockVariants, actualTimeToSet);
+    };
+    masterBlock.addEventListener('change', onTimeFieldsChange);
+  };
+  addMutualChangeListener(timeinField, timeinFieldVariants, timeoutField, timeoutFieldsVariants);
+  addMutualChangeListener(timeoutField, timeoutFieldsVariants, timeinField, timeinFieldVariants);
+
+};
+checkNoticeForm(noticeFormBlock, FlatType.PRICE_MIN);
 
