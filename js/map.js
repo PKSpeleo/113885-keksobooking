@@ -529,17 +529,20 @@ var checkNoticeForm = function (blockDom, flatMapa) {
           value.removeAttribute('selected');
         });
         blockVariants.forEach(function (value) {
+          debugger;
           if ((value.getAttribute('value') === valueToSet) && (block.getAttribute('id') === 'room_number')) {
             value.setAttribute('selected', '');
             block.value = valueToSet;
           } else if (block.getAttribute('id') === 'capacity') {
-            debugger;
             if (ROOM_TO_CAPACITY[valueToSet].includes(parseInt(value.value, 10))) {
-              debugger;
+              value.removeAttribute('disabled');
               console.log(ROOM_TO_CAPACITY[valueToSet]);
+            } else {
+              value.setAttribute('disabled', '');
             }
           }
         });
+        slaveBlock.value = '';
       };
       setSelectedAttributeAndValue(masterBlock, masterBlockVariants, slaveBlock, slaveBlockVariants, actualToSet);
       setSelectedAttributeAndValue(slaveBlock, slaveBlockVariants, masterBlock, masterBlockVariants, actualToSet);
@@ -548,6 +551,7 @@ var checkNoticeForm = function (blockDom, flatMapa) {
     masterBlock.addEventListener('change', onRoomsOrCapacityFieldsChange);
   };
   addMutualChangeListenerForRoomsAndCapacity(roomNumberField, roomNumberVariants, capacityField, capacityFieldVariants);
+  // addMutualChangeListenerForRoomsAndCapacity(capacityField, capacityFieldVariants, roomNumberField, roomNumberVariants);
 };
 checkNoticeForm(noticeFormBlock, FlatType.PRICE_MIN);
 
