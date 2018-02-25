@@ -475,6 +475,7 @@ var checkNoticeForm = function (blockDom, flatMapa) {
   priceInput.setAttribute('required', '');
   priceInput.setAttribute('max', '1000000');
   var typeField = blockDom.querySelector('#type');
+  priceInput.setAttribute('min', flatMapa[typeField.value]);
   var onTypeFieldChange = function () {
     priceInput.setAttribute('min', flatMapa[typeField.value]);
   };
