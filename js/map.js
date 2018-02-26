@@ -1,6 +1,4 @@
 'use strict';
-// Количество объявлений
-var ADS_QUANTITY = 8;
 
 // Смещения для нахождения кончика метки - противоречит заданию,
 // но соответствует реальности, отсчет от центра
@@ -24,132 +22,6 @@ var FlatType = {
   }
 };
 
-// Здесь храним исходные данные для генерации объявлений
-var INITIAL_DATA = {
-  avatarPathName: 'img/avatars/user0',
-  avatarExtension: '.png',
-  title: [
-    'Большая уютная квартира',
-    'Маленькая неуютная квартира',
-    'Огромный прекрасный дворец',
-    'Маленький ужасный дворец',
-    'Красивый гостевой домик',
-    'Некрасивый негостеприимный домик',
-    'Уютное бунгало далеко от моря',
-    'Неуютное бунгало по колено в воде'
-  ],
-  addressSeparator: ', ',
-  priceMin: 1000,
-  priceMax: 1000000,
-  roomsMin: 1,
-  roomsMax: 5,
-  guestsMin: 1,
-  guestsMax: 10,
-  checkinCheckout: [
-    '12:00',
-    '13:00',
-    '14:00'
-  ],
-  features: [
-    'wifi',
-    'dishwasher',
-    'parking',
-    'washer',
-    'elevator',
-    'conditioner'
-  ],
-  description: '',
-  photos: [
-    'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
-    'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
-    'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
-  ],
-  locationXMin: 300,
-  locationXMax: 900,
-  locationYMin: 150,
-  locationYMax: 500
-};
-
-/**
- * Генерируем случайнео целое число от минимума (вкл) до максимума (вкл)
- * @param {number} min - минимльное целое число (вкл)
- * @param {number} max - максимальное целое число (вкл)
- * @return {number} - случайное целое число
- */
-var randomiseIntegerMinToMax = function (min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
-/**
- * Функция выбора случайных элеменов массива
- * @param {array} arr - массив
- * @return {*} - случайный элемент массива
- */
-var chooseRandomArrElement = function (arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-};
-
-/**
- * Функция откидывания рандомного количества элементов массива с конца
- * @param {array} arr - массив от которого надо откинуть хваост
- * @return {array} - обрезанный с хвоста массив
- */
-var cropArrayFromEnd = function (arr) {
-  return arr.slice(0, randomiseIntegerMinToMax(0, arr.length));
-};
-
-/**
- * Функция, которая перемешивает массив!
- * @param {array} array - массив для перемешивания
- * @return {array} - возвращает перемешанный масив
- */
-var mixArrayRandomly = function (array) {
-  return array.slice().sort(function () {
-    return randomiseIntegerMinToMax(0, 1);
-  });
-};
-
-/**
- * Функция создания массива объектов объявлений с данными
- * @param {object} variantsOfObject - объект с вариантами содержимого объявлений
- * @param {object} FlatTypeMapa - мапа для типов илищь
- * @param {number} adsQuantity - количество объявлений
- * @return {Array} - возвращает массив объектов объявлений
- */
-var generateAds = function (variantsOfObject, FlatTypeMapa, adsQuantity) {
-  var adsArray = [];
-  var locationX;
-  var locationY;
-  for (var i = 0; i < adsQuantity; i++) {
-    locationX = randomiseIntegerMinToMax(
-        variantsOfObject.locationXMax, variantsOfObject.locationXMin);
-    locationY = randomiseIntegerMinToMax(
-        variantsOfObject.locationYMin, variantsOfObject.locationYMax);
-    adsArray[i] = {
-      author: {
-        avatar: variantsOfObject.avatarPathName + (i + 1) + variantsOfObject.avatarExtension
-      },
-      offer: {
-        title: variantsOfObject.title[i],
-        address: locationX + variantsOfObject.addressSeparator + locationY,
-        price: randomiseIntegerMinToMax(variantsOfObject.priceMin, variantsOfObject.priceMax),
-        type: chooseRandomArrElement(Object.keys(FlatTypeMapa.TRANSLATE)),
-        rooms: randomiseIntegerMinToMax(variantsOfObject.roomsMin, variantsOfObject.roomsMax),
-        guests: randomiseIntegerMinToMax(variantsOfObject.guestsMin, variantsOfObject.guestsMax),
-        checkin: chooseRandomArrElement(variantsOfObject.checkinCheckout),
-        checkout: chooseRandomArrElement(variantsOfObject.checkinCheckout),
-        features: cropArrayFromEnd(variantsOfObject.features),
-        description: variantsOfObject.description,
-        photos: mixArrayRandomly(variantsOfObject.photos)
-      },
-      location: {
-        x: locationX,
-        y: locationY
-      }
-    };
-  }
-  return adsArray;
-};
 
 /**
  * Функция, которая скрывает или показывает блок, удаляя или добавляя
@@ -297,7 +169,7 @@ var createMapCardElement = function (adsObject, template, variantsOfType) {
 };
 
 // Генерируем обявления
-var adsArrayRandom = generateAds(INITIAL_DATA, FlatType, ADS_QUANTITY);
+var adsArrayRandom = window.data.generateAds();
 
 var mapBlock = document.querySelector('.map');
 // setOrRemoveClassMapFaded(mapBlock, true);

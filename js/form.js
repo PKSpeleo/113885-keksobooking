@@ -3,7 +3,7 @@
   // Мапа для типов жидищь
   var FlatType = {
     PRICE_MIN: {
-      flat: 1000,2
+      flat: 1000,
       bungalo: 0,
       house: 5000,
       palace: 10000
@@ -99,7 +99,7 @@
         timeinField, timeinFieldVariants, timeoutField, timeoutFieldsVariants);
     // Навешиваем обработчик на изменения в поле timeOut
     addMutualChangeListener(
-       timeoutField, timeoutFieldsVariants, timeinField, timeinFieldVariants);
+        timeoutField, timeoutFieldsVariants, timeinField, timeinFieldVariants);
 
     // Где же у нас комнаты и вместимость?
     var roomNumberField = blockDom.querySelector('#room_number');
