@@ -15,6 +15,21 @@ var KEY_CODES = {
   esc: 27
 };
 
+// Мапа для типов жидищь
+var FlatType = {
+  TRANSLATE: {
+    flat: 'Квартира',
+    house: 'Дом',
+    bungalo: 'Бунгало'
+  },
+  PRICE_MIN: {
+    flat: 1000,
+    bungalo: 0,
+    house: 5000,
+    palace: 10000
+  }
+};
+
 // Здесь храним исходные данные для генерации объявлений
 var INITIAL_DATA = {
   avatarPathName: 'img/avatars/user0',
@@ -32,11 +47,6 @@ var INITIAL_DATA = {
   addressSeparator: ', ',
   priceMin: 1000,
   priceMax: 1000000,
-  type: {
-    flat: 'Квартира',
-    house: 'Дом',
-    bungalo: 'Бунгало'
-  },
   roomsMin: 1,
   roomsMax: 5,
   guestsMin: 1,
@@ -108,10 +118,11 @@ var mixArrayRandomly = function (array) {
 /**
  * Функция создания массива объектов объявлений с данными
  * @param {object} variantsOfObject - объект с вариантами содержимого объявлений
+ * @param {object} FlatTypeMapa - мапа для типов илищь
  * @param {number} adsQuantity - количество объявлений
  * @return {Array} - возвращает массив объектов объявлений
  */
-var generateAds = function (variantsOfObject, adsQuantity) {
+var generateAds = function (variantsOfObject, FlatTypeMapa, adsQuantity) {
   var adsArray = [];
   var locationX;
   var locationY;
@@ -128,7 +139,7 @@ var generateAds = function (variantsOfObject, adsQuantity) {
         title: variantsOfObject.title[i],
         address: locationX + variantsOfObject.addressSeparator + locationY,
         price: randomiseIntegerMinToMax(variantsOfObject.priceMin, variantsOfObject.priceMax),
-        type: chooseRandomArrElement(Object.keys(variantsOfObject.type)),
+        type: chooseRandomArrElement(Object.keys(FlatTypeMapa.TRANSLATE)),
         rooms: randomiseIntegerMinToMax(variantsOfObject.roomsMin, variantsOfObject.roomsMax),
         guests: randomiseIntegerMinToMax(variantsOfObject.guestsMin, variantsOfObject.guestsMax),
         checkin: chooseRandomArrElement(variantsOfObject.checkinCheckout),
@@ -174,7 +185,7 @@ var createMapMarkerElement = function (adObject, index, templateObject, offsetX,
   var button = templateObject.cloneNode(true);
   button.style.left = (adObject.location.x - offsetX) + 'px';
   button.style.top = (adObject.location.y - offsetY) + 'px';
-  button.dataset.addId = index;
+  button.dataset.addId = index.toString();
   // Цепляем картинку на указатель и задаем ей параметры
   var image = button.querySelector('img');
   image.setAttribute('src', adObject.author.avatar);
@@ -185,7 +196,7 @@ var createMapMarkerElement = function (adObject, index, templateObject, offsetX,
 };
 
 /**
- * Функцию создает и заполняет блока маркеров DOM-элементами на основе массива JS-объектов
+ * Функция создает и заполняет блок маркеров DOM-элементами на основе массива JS-объектов
  * с применением шаблона
  * @param {array} ads - массив объектов объявлений
  * @param {object} templateBlock - блок шаблона, на основе которого мы создаем маркеры
@@ -249,7 +260,7 @@ var fillPopupFeaturesBlock = function (listBlock, array) {
   }
 };
 /**
- * функуия создает DOM элемент карточки на основе JS объекта, шаблона
+ * Функция создает DOM элемент карточки на основе JS объекта, шаблона
  * и вариантов перевода;_
  * @param {object} adsObject - объкт объявления
  * @param {object} template - шаблон
@@ -292,7 +303,7 @@ var createMapCardElement = function (adsObject, template, variantsOfType) {
 };
 
 // Генерируем обявления
-var adsArrayRandom = generateAds(INITIAL_DATA, ADS_QUANTITY);
+var adsArrayRandom = generateAds(INITIAL_DATA, FlatType, ADS_QUANTITY);
 
 var mapBlock = document.querySelector('.map');
 // setOrRemoveClassMapFaded(mapBlock, true);
@@ -340,6 +351,17 @@ var setOrRemoveClassNoticeFormDisabled = function (block, status) {
 };
 
 /**
+ * Функция обработчика события нажатия кнопки ESC - акрывает карточку
+ * @param {object} evt - объектс с данными о событии
+ */
+var onDocumentKeydown = function (evt) {
+  if (evt.keyCode === KEY_CODES.esc) {
+    mapBlock.removeChild(mapBlock.querySelector('.popup'));
+    document.removeEventListener('keydown', onDocumentKeydown);
+  }
+};
+
+/**
  * Функция акивации и деактивации страницы
  * @param {object} blockOfMap - блок карты
  * @param {object} blockOfForm - блок формы
@@ -355,8 +377,8 @@ var setActiveOrInactivePage = function (blockOfMap, blockOfForm, status) {
         adsArrayRandom, mapMarketTemplateFragment, MAP_MARKER_OFFSET);
     // Отрисовываем маркеры там, где надо
     mapMarker.appendChild(mapMarkersFragment);
-    // Обходим одновременный mousdown и click от перетаскивания маркера
-    setTimeout(setEventListenerToClickOnMap, 1000);
+    // Вешаем обработчик клика по карте в поисках метки
+    mapBlock.addEventListener('click', onMapClick);
   }
 };
 
@@ -405,7 +427,6 @@ buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
 // Вешаем обработчик событий на клик по кнопке активации карты
 buttonOfMapActivation.addEventListener('mouseup', onButtonMouseup);
 
-
 // Находим шаблон для карточки
 var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
 
@@ -414,29 +435,228 @@ var mapCardTemplate = document.querySelector('template').content.querySelector('
  * @param {object} evt - объект с данными о собитии
  */
 var onMapClick = function (evt) {
-  // Спрашиваем, а кнопка ли это (в нее тыкаем или в катинку, которая в ней)
-  if (evt.target.tagName === 'BUTTON' || evt.target.parentNode.tagName === 'BUTTON') {
+  // Спрашиваем, а ярлычек ли это (в него тыкаем или в картинку, которая в ней)
+  // Плюс убиваем второго зайца - отбиваемся от 'click' идущем сразу за 'mousedown':)
+  // Это вместо preventDefault
+  if (evt.target.className === 'map__pin' ||
+    evt.target.parentNode.className === 'map__pin') {
     // Вытаскиваем номер объявления из атрибутов кнопки;)
-    var addIndex = evt.target.dataset.addId || evt.target.parentNode.dataset.addId;
+    var addIndex = evt.target.dataset.addId ||
+      evt.target.parentNode.dataset.addId;
     // Создаем и заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
-    var mapCardFragment = createMapCardElement(adsArrayRandom[addIndex], mapCardTemplate, INITIAL_DATA.type);
+    var mapCardFragment = createMapCardElement(
+        adsArrayRandom[addIndex], mapCardTemplate, FlatType.TRANSLATE);
     // Находим, куда засовывать фрагмент с диалогом
-    var mapCard = document.querySelector('.map');
     var mapFiltersContainer = document.querySelector('.map__filters-container');
     // Проверяем, открыта ли карточка. Если открыта, то удаляем перед отрисовкой новой.
-    if (mapCard.querySelector('.popup')) {
-      mapCard.removeChild(mapCard.querySelector('.popup'));
+    // Удаляем из отображения, а уже ПОТОМ отрисовываем карточку (код ниже)
+
+    if (mapBlock.querySelector('.popup')) {
+      mapBlock.removeChild(mapBlock.querySelector('.popup'));
     }
     // Отрисовываем там, где надо
-    mapCard.insertBefore(mapCardFragment, mapFiltersContainer);
+    mapBlock.insertBefore(mapCardFragment, mapFiltersContainer);
+    // Вешаем обработчик на клавишу ESC по всей карте
+    document.addEventListener('keydown', onDocumentKeydown);
+
+  } else if (evt.target.className === 'popup__close') {
+    // Если кликнули по кнопке закрытия карточки - удаляем ее
+    mapBlock.removeChild(mapBlock.querySelector('.popup'));
+    // Удаляем обработчик нажатия на ESC
+    document.removeEventListener('keydown', onDocumentKeydown);
   }
 };
 
 /**
- * Функция, которая ставит обработчик событий на клик по карте в поисках клика
- * указателе объявления
- * Отлельно так - чтобы сделать задержку, чтобы не было клика сразу после маусдаун.
+ * Функция проверки и подготовки формы к работе
+ * @param {object} blockDom - блок с формой
+ * @param {object} flatMapa - объект с мапой по типам жилищь
  */
-var setEventListenerToClickOnMap = function () {
-  mapBlock.addEventListener('click', onMapClick);
+var checkAndChangeNoticeForm = function (blockDom, flatMapa) {
+  // Где же заголовок?
+  var titleField = blockDom.querySelector('#title');
+  // Правим атрибуты заголовка
+  titleField.setAttribute('required', '');
+  titleField.setAttribute('minlength', '30');
+  titleField.setAttribute('maxlength', '100');
+
+  // Где же поле цены?
+  var priceInput = blockDom.querySelector('#price');
+  // Правим статичные атрибуты цены
+  priceInput.setAttribute('required', '');
+  priceInput.setAttribute('max', '1000000');
+  // Где же тип жилья?
+  var typeField = blockDom.querySelector('#type');
+  priceInput.setAttribute('min', flatMapa[typeField.value]);
+  /**
+   * Функция - обработчик собитыия на изменения в поле тип жилья
+   */
+  var onTypeFieldChange = function () {
+    // Меняем атрибут минимальноей цены согласно мапе
+    priceInput.setAttribute('min', flatMapa[typeField.value]);
+  };
+  // Добавляем обработчик события на изменение поля тип жилья
+  typeField.addEventListener('change', onTypeFieldChange);
+
+  // Где же адрес? Там ставим статичные атрибуты
+  blockDom.querySelector('#address').setAttribute('readonly', '');
+
+  // Где же поле времени заезды и его варинты?
+  var timeinField = blockDom.querySelector('#timein');
+  var timeinFieldVariants = timeinField.querySelectorAll('option');
+  var timeoutField = blockDom.querySelector('#timeout');
+  var timeoutFieldsVariants = timeoutField.querySelectorAll('option');
+  /**
+   * Функция добавляет обработчик события изменений в двух полях
+   * времени заезда и выезда и их связывание
+   * согласно тз, согласно ведущему и ведомогу полю
+   * Раделение на ведущее и ведомое для того, чтобы использовать эту функцию
+   * для навешивания на кажое поле в отдельности, задавая параметры
+   * @param {object} masterBlock - Первое поле (Ведущее)
+   * @param {object} masterBlockVariants - Варианты первого поля (Ведущего)
+   * @param {object} slaveBlock - Второе поле (Ведомое)
+   * @param {object} slaveBlockVariants - Варианты второго поля (Ведомого)
+   */
+  var addMutualChangeListener = function (masterBlock, masterBlockVariants, slaveBlock, slaveBlockVariants) {
+    /**
+     * Собственно сама функция - обработчик события изменения поля
+     */
+    var onTimeFieldsChange = function () {
+      // Берем за основу время, выбранное в данном поле
+      var actualTimeToSet = masterBlock.value;
+      /**
+       * Функция проставляет атрибут selected там где надо, где не надо - убирает
+       * а также принудительно проставляет value у поля
+       * @param {object} block - блок с полем
+       * @param {object} blockVariants - массив боорками с вариантами этого поля
+       * @param {string} time - время которе проставляем
+       */
+      var setSelectedAttributeAndValue = function (block, blockVariants, time) {
+        // Убарем у всех вариантов полей атрибут selected от греха подальше, дабы не глучило;)
+        blockVariants.forEach(function (value) {
+          value.removeAttribute('selected');
+        });
+        // А тут проставляем атрибут selected там где надо и насильно присваиваем value, дабы не глучило;)
+        blockVariants.forEach(function (value) {
+          if (value.getAttribute('value') === time) {
+            value.setAttribute('selected', '');
+            block.value = time;
+          }
+        });
+      };
+      // Проходимся по ведущему полю, меняем на текущее значение, правим атрибуты, ставим value
+      setSelectedAttributeAndValue(masterBlock, masterBlockVariants, actualTimeToSet);
+      // Проходимся по ведомомн полю, меняем на текущее значение, правим атрибуты, ставим value
+      setSelectedAttributeAndValue(slaveBlock, slaveBlockVariants, actualTimeToSet);
+    };
+    // Навешиваем обработчик событий
+    masterBlock.addEventListener('change', onTimeFieldsChange);
+  };
+  // Навешиваем обработчик на изменения в поле timeIn
+  addMutualChangeListener(
+      timeinField, timeinFieldVariants, timeoutField, timeoutFieldsVariants);
+  // Навешиваем обработчик на изменения в поле timeOut
+  addMutualChangeListener(
+      timeoutField, timeoutFieldsVariants, timeinField, timeinFieldVariants);
+
+  // Где же у нас комнаты и вместимость?
+  var roomNumberField = blockDom.querySelector('#room_number');
+  var roomNumberVariants = roomNumberField.querySelectorAll('option');
+  var capacityField = blockDom.querySelector('#capacity');
+  var capacityFieldVariants = capacityField.querySelectorAll('option');
+  // Мапа для вместимости комнат
+  var ROOM_TO_CAPACITY = {
+    '1': [1],
+    '2': [1, 2],
+    '3': [1, 2, 3],
+    '100': [0]
+  };
+  // Прописываем статичные атрибуты
+  capacityField.setAttribute('required', '');
+  // Для порядка делаем value пустым, чтобы обязать его заполнить выбрав вариант
+  capacityField.value = '';
+  // Прописываем статичные атрибуты
+  roomNumberField.setAttribute('required', '');
+  // Для порядка делаем value пустым, чтобы обязать его заполнить выбрав вариант
+  roomNumberField.value = '';
+  /**
+   * Функция навешивает обработчик на изменения в поле мастер
+   * и корректирует видимости вариантов согласно мапе
+   * Структура странная, была идея одна, но потом она превратилась в другую,
+   * а струтура "симметричности" функции оставил, хотя она так и не работает
+   * @param {object} masterBlock - Вудущиий блок - количество комнат
+   * @param {object} masterBlockVariants - массив объектов вариантов количества комнат
+   * @param {object} slaveBlock - Ведомый блок - количество гостей
+   * @param {object} slaveBlockVariants - массив объектов варинтов количества гостей
+   */
+  var addChangeListenerForRoomsAndCapacity = function (
+      masterBlock, masterBlockVariants, slaveBlock, slaveBlockVariants) {
+    /**
+     * Функция - обработчик события внесения изменений в поле количества комнат
+     */
+    var onRoomsFieldsChange = function () {
+      // Берем за базу - выбранное значение
+      var actualToSet = masterBlock.value;
+      /**
+       * Функция, которая проставляет атрибуты selected и disabled согласно ТЗ.
+       * Заодно принудительно проставляет value то со значением то с пустым значением
+       * Функция сумасшедшая! Сам ее понимаю на уровне подсознания;) Но работает отлично;)
+       * Зато "симметричная";)
+       * @param {object} block - Поле которе правим
+       * @param {object} blockVariants - Массив объектов возможных значений полей
+       * @param {string} valueToSet - Значение от которого отталкиваемся
+       */
+      var setSelectedAttributeAndValue = function (block, blockVariants, valueToSet) {
+        // Зачищаем атрибут selected на всякий пожарный
+        blockVariants.forEach(function (value) {
+          value.removeAttribute('selected');
+        });
+        // А туууут... Выствляем нужные значения;) value, selected, disabled
+        blockVariants.forEach(function (value) {
+          // Если это про количество комнат и оно равно нужному то...
+          if ((value.getAttribute('value') === valueToSet) &&
+            (block.getAttribute('id') === 'room_number')) {
+            // Добавляем атрибут selected
+            value.setAttribute('selected', '');
+            // И принудительно ставим value
+            block.value = valueToSet;
+            // Если это про вместимость гостей...
+          } else if (block.getAttribute('id') === 'capacity') {
+            // И это тот самы вариант, который подходит согласно мапе
+            if (ROOM_TO_CAPACITY[valueToSet].includes(parseInt(value.value, 10))) {
+              // То даем возможность его выбирать
+              value.removeAttribute('disabled');
+            } else {
+              // А если не то - то не даем;)
+              value.setAttribute('disabled', '');
+            }
+          }
+        });
+        // Принудительно сбрасываем, чтобы не выбирать за пользователя, а ему напомнит валидация
+        slaveBlock.value = '';
+      };
+      // Обрабатываем поле с количеством комнат хитрой "симметричной" функцией
+      setSelectedAttributeAndValue(
+          masterBlock, masterBlockVariants, actualToSet);
+      // А теперь обрабатываем поле количества гостей той же хихитрой функцией;)
+      setSelectedAttributeAndValue(
+          slaveBlock, slaveBlockVariants, actualToSet);
+    };
+    // Навешиваем обработчик событий на изменения в поле количества комнат
+    masterBlock.addEventListener('change', onRoomsFieldsChange);
+  };
+  // Функция, навешивающая изменения в поле количесва комнат
+  addChangeListenerForRoomsAndCapacity(
+      roomNumberField, roomNumberVariants, capacityField, capacityFieldVariants);
+
+  // А эти строчки, чтобы форма отправлялась в адресную строчку, чтобы можно было проверить;)
+  blockDom.querySelector('form').setAttribute('action', '/123.txt');
+  blockDom.querySelector('form').setAttribute('method', 'get');
 };
+
+// Находим, где же форма
+var noticeFormBlock = document.querySelector('.notice');
+
+// Проверяем, правим форму!
+checkAndChangeNoticeForm(noticeFormBlock, FlatType.PRICE_MIN);
+
