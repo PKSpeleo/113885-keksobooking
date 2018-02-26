@@ -30,9 +30,8 @@ var onDocumentKeydown = function (evt) {
 // Находим кнопку активации карты
 var buttonOfMapActivation = document.querySelector('.map__pin--main');
 
-
 /**
- * Функция акивации и деактивации страницы
+ * Функция акивации и деактивации страницы и рисования пинов
  * @param {object} blockOfMap - блок карты
  * @param {object} blockOfForm - блок формы
  * @param {boolean} status - Если True - то видно, если False - то нет;)
@@ -40,7 +39,7 @@ var buttonOfMapActivation = document.querySelector('.map__pin--main');
 var activateAndDrawPins = function (blockOfMap, blockOfForm, status) {
   window.activation.setActiveOrInactivePage(blockOfMap, blockOfForm, status);
   if (!status) {
-    window.pin.drawPins(adsArrayRandom);
+    window.pin.drawPins(adsArrayRandom, mapBlock);
     // Вешаем обработчик клика по карте в поисках метки
     mapBlock.addEventListener('click', onMapClick);
   }

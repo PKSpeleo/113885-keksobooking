@@ -12,12 +12,6 @@
   // Находим шаблон маркеров
   var mapMarketTemplateFragment = templateFragment.querySelector('.map__pin');
 
-  // Ищим блок с картой
-  var mapBlock = document.querySelector('.map');
-
-  // Находим, где отрисоовывать фрагмент маркеров
-  var mapMarker = mapBlock.querySelector('.map__pins');
-
   /**
    * функцию создания DOM-элемента маркера на основе JS-объекта
    * @param {object} adObject - Объект с объявлением
@@ -62,11 +56,18 @@
     return domBlock;
   };
   window.pin = {
-    drawPins: function (adsArrayRandom) {
+    /**
+     * Функуия рисует пины на карте на основе массива с рандомными
+     * объявлениями в блоке карт
+     * @param {array} adsArrayRandom - массив объявлений
+     * @param {object} mapBlock - блок карты
+     */
+    drawPins: function (adsArrayRandom, mapBlock) {
       // Создаем и заполняем фрагмент маркеров объявлениями
       var mapMarkersFragment = createMapFragmentByMarkersWithTemplate(
           adsArrayRandom, mapMarketTemplateFragment, MAP_MARKER_OFFSET);
-      // Отрисовываем маркеры там, где надо
+      // Находим, где отрисоовывать фрагмент маркеров
+      var mapMarker = mapBlock.querySelector('.map__pins');
       mapMarker.appendChild(mapMarkersFragment);
     }
   };
