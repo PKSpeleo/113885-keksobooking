@@ -52,9 +52,9 @@
    */
   var onButtonMouseup = function (evt) {
     activateAndDrawPins(mapBlock, noticeForm, false);
-    // прописываем в поле адрес положение мышки в момент клика
-    addressField.setAttribute(
-        'value', evt.pageX + ' , ' + evt.pageY);
+    // // прописываем в поле адрес положение мышки в момент клика
+    // addressField.setAttribute(
+    //     'value', evt.pageX + ' , ' + evt.pageY);
     // Удаляем обработчики
     buttonOfMapActivation.removeEventListener('mouseup', onButtonMouseup);
     buttonOfMapActivation.removeEventListener('keydown', onButtonKeydown);
@@ -76,10 +76,10 @@
   // Для начала делаем страницу неактивной.
   window.activation.setActiveOrInactivePage(mapBlock, noticeForm, true);
 
-  // Находим поле ядреса
-  var addressField = document.querySelector('#address');
   // Прописываем начальный адрес
-  document.querySelector('#address').setAttribute('value', '600, 375');
+  // document.querySelector('#address').setAttribute('value', '600, 375');
+  // debugger;
+  window.form.setAddress('600', '352');
 
   // Вешаем обработчик на нажатие клавиши ENTER по кнопке активации карты
   buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
@@ -126,6 +126,56 @@
       document.removeEventListener('keydown', onDocumentKeydown);
     }
   };
+
+  // move
+
+  // var bodyBlock = document.querySelector('body');
+  var onButtonMouseDown = function (evtDown) {
+    // evtDown.preventDefault();
+    var startPosition = {
+      x: evtDown.pageX,
+      y: evtDown.pageY
+    };
+    var onMouseMove = function (evtMove) {
+      // evtMove.preventDefault();
+      var shift = {
+        x: startPosition.x - evtMove.pageX,
+        y: startPosition.y - evtMove.pageY
+      };
+      // console.log('C ' + window.innerWidth, evtMove.clientY);
+      // console.log('C ' + evtMove.clientX, evtMove.clientY);
+      // console.log('P ' + evtMove.pageX, evtMove.pageY);
+      console.log('LayerY ' + evtMove.layerY + ' PageY ' + evtMove.pageY);
+      // console.log('L M ' + mapBlock.getBoundingClientRect().left);
+      // console.log('T M ' + mapBlock.getBoundingClientRect().top);
+      // console.log('L B ' + bodyBlock.getBoundingClientRect().left);
+      // console.log('T B ' + bodyBlock.getBoundingClientRect().top);
+      console.log('X: ' + (evtMove.pageX - evtMove.layerX - Math.floor(mapBlock.getBoundingClientRect().left)) + ' Y: ' + (evtMove.pageY + (94 / 2) - evtMove.layerY));
+
+
+      startPosition = {
+        x: evtMove.pageX,
+        y: evtMove.pageY
+      };
+      // debugger;
+      buttonOfMapActivation.style.top = (buttonOfMapActivation.offsetTop - shift.y) + 'px';
+      buttonOfMapActivation.style.left = (buttonOfMapActivation.offsetLeft - shift.x) + 'px';
+
+    };
+    var onMouseUpAfterMove = function () {
+      mapBlock.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUpAfterMove);
+    };
+
+    mapBlock.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUpAfterMove);
+  };
+  buttonOfMapActivation.addEventListener('mousedown', onButtonMouseDown);
+  // debugger;
+
+
+  // Корректируем форму
+  window.form.init();
 })();
 
 

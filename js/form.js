@@ -9,6 +9,8 @@
       palace: 10000
     }
   };
+  // Где же блок адреса
+  var addressBlock = document.querySelector('#address');
   /**
    * Функция проверки и подготовки формы к работе
    * @param {object} blockDom - блок с формой
@@ -40,8 +42,8 @@
     // Добавляем обработчик события на изменение поля тип жилья
     typeField.addEventListener('change', onTypeFieldChange);
 
-    // Где же адрес? Там ставим статичные атрибуты
-    blockDom.querySelector('#address').setAttribute('readonly', '');
+    // Ставим статичные атрибуты адресу
+    addressBlock.setAttribute('readonly', '');
 
     // Где же поле времени заезды и его варинты?
     var timeinField = blockDom.querySelector('#timein');
@@ -199,6 +201,12 @@
   // Находим, где же форма
   var noticeFormBlock = document.querySelector('.notice');
 
-  // Проверяем, правим форму!
-  checkAndChangeNoticeForm(noticeFormBlock, FlatType.PRICE_MIN);
+  window.form = {
+    setAddress: function (addressX, addressY) {
+      addressBlock.value = addressX + ', ' + addressY;
+    },
+    init: function () {
+      checkAndChangeNoticeForm(noticeFormBlock, FlatType.PRICE_MIN);
+    }
+  };
 })();
