@@ -1,7 +1,10 @@
 'use strict';
 (function () {
-
-// Коды клавиатуры
+  var INIT_ADDRESS = {
+    x: 600,
+    y: 352
+  };
+  // Коды клавиатуры
   var KEY_CODES = {
     enter: 13,
     esc: 27
@@ -79,7 +82,7 @@
   // Прописываем начальный адрес
   // document.querySelector('#address').setAttribute('value', '600, 375');
   // debugger;
-  window.form.setAddress('600', '352');
+  window.form.setAddress(INIT_ADDRESS.x, INIT_ADDRESS.y);
 
   // Вешаем обработчик на нажатие клавиши ENTER по кнопке активации карты
   buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
@@ -142,29 +145,20 @@
         x: startPosition.x - evtMove.pageX,
         y: startPosition.y - evtMove.pageY
       };
-      // console.log('C ' + window.innerWidth, evtMove.clientY);
-      // console.log('C ' + evtMove.clientX, evtMove.clientY);
-      // console.log('P ' + evtMove.pageX, evtMove.pageY);
-      console.log('LayerY ' + evtMove.layerY + ' PageY ' + evtMove.pageY);
-      // console.log('L M ' + mapBlock.getBoundingClientRect().left);
-      // console.log('T M ' + mapBlock.getBoundingClientRect().top);
-      // console.log('L B ' + bodyBlock.getBoundingClientRect().left);
-      // console.log('T B ' + bodyBlock.getBoundingClientRect().top);
-      console.log('X: ' + (evtMove.pageX - evtMove.layerX - Math.floor(mapBlock.getBoundingClientRect().left)) + ' Y: ' + (evtMove.pageY + (94 / 2) - evtMove.layerY));
-
+      window.form.setAddress(window.pin.AddressFromMouseEvent.getX(evtMove, mapBlock), window.pin.AddressFromMouseEvent.getY(evtMove));
 
       startPosition = {
         x: evtMove.pageX,
         y: evtMove.pageY
       };
-      // debugger;
-      buttonOfMapActivation.style.top = (buttonOfMapActivation.offsetTop - shift.y) + 'px';
-      buttonOfMapActivation.style.left = (buttonOfMapActivation.offsetLeft - shift.x) + 'px';
+
+      window.pin.move(buttonOfMapActivation, shift);
 
     };
-    var onMouseUpAfterMove = function () {
+    var onMouseUpAfterMove = function (evtMouse) {
       mapBlock.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUpAfterMove);
+      window.form.setAddress(window.pin.AddressFromMouseEvent.getX(evtMouse, mapBlock), window.pin.AddressFromMouseEvent.getY(evtMouse));
     };
 
     mapBlock.addEventListener('mousemove', onMouseMove);

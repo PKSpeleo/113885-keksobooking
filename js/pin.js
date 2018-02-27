@@ -4,7 +4,8 @@
   // но соответствует реальности, отсчет от центра
   var MAP_MARKER_OFFSET = {
     x: 0,
-    y: 35
+    y: 35,
+    mainY: 49
   };
   // находим шаблон
   var templateFragment = document.querySelector('template').content;
@@ -69,6 +70,29 @@
       // Находим, где отрисоовывать фрагмент маркеров
       var mapMarker = mapBlock.querySelector('.map__pins');
       mapMarker.appendChild(mapMarkersFragment);
+    },
+    AddressFromMouseEvent: {
+      /**
+       * Функция высчитывает координаты в системе карты из события
+       * @param {object} mouseEvent - событие мыши
+       * @param {object} mapBlock - блок пина
+       * @return {number} - координата в системе карты
+       */
+      getX: function (mouseEvent, mapBlock) {
+        return (mouseEvent.pageX - mouseEvent.layerX - Math.floor(mapBlock.getBoundingClientRect().left));
+      },
+      /**
+       * Функция высчитывает координаты в системе карты из события
+       * @param {object} mouseEvent - событие мыши
+       * @return {number} - координата в системе карты
+       */
+      getY: function (mouseEvent) {
+        return (mouseEvent.pageY + MAP_MARKER_OFFSET.mainY - mouseEvent.layerY);
+      }
+    },
+    move: function (button, shift) {
+      button.style.top = (button.offsetTop - shift.y) + 'px';
+      button.style.left = (button.offsetLeft - shift.x) + 'px';
     }
   };
 })();

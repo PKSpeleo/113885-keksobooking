@@ -202,9 +202,17 @@
   var noticeFormBlock = document.querySelector('.notice');
 
   window.form = {
+    /**
+     * Устанавливает значение адреса на переданные значения в поле адреса
+     * @param {number} addressX - адрес Х
+     * @param {number} addressY - адрес У
+     */
     setAddress: function (addressX, addressY) {
       addressBlock.value = addressX + ', ' + addressY;
     },
+    /**
+     * Функция инициализации карты
+     */
     init: function () {
       checkAndChangeNoticeForm(noticeFormBlock, FlatType.PRICE_MIN);
     }
