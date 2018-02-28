@@ -5,7 +5,7 @@
   var MAP_MARKER_OFFSET = {
     x: 0,
     y: 35,
-    mainY: 49
+    mainY: 45
   };
   // находим шаблон
   var templateFragment = document.querySelector('template').content;

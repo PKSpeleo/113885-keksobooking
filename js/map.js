@@ -141,51 +141,49 @@
   var onButtonMouseDown = function (evtDown) {
     evtDown.preventDefault();
     var startPosition = {
-      x: evtDown.pageX,
-      x2: evtDown.layerX,
-      y: evtDown.pageY,
-      y2: evtDown.layerY
+      pageX: evtDown.pageX,
+      layerX: evtDown.layerX,
+      pageY: evtDown.pageY,
+      layerY: evtDown.layerY
     };
 
     var onMouseMove = function (evtMove) {
       evtMove.preventDefault();
-
+      var tempCoord = {};
       if (evtMove.pageY > 500) {
-        var tempPageY = startPosition.y;
-        var tempPageX = startPosition.x;
-        var tempLayerY = startPosition.y2;
-        var tempLayerX = startPosition.x2;
+        tempCoord.pageY = startPosition.pageY;
+        tempCoord.pageX = startPosition.pageX;
+        tempCoord.layerY = startPosition.layerY;
+        tempCoord.layerX = startPosition.layerX;
       } else {
-        tempPageX = evtMove.pageX;
-        tempPageY = evtMove.pageY;
-        tempLayerY = evtMove.layerY;
-        tempLayerX = evtMove.layerX;
+        tempCoord.pageX = evtMove.pageX;
+        tempCoord.pageY = evtMove.pageY;
+        tempCoord.layerY = evtMove.layerY;
+        tempCoord.layerX = evtMove.layerX;
       }
       var shift = {
-        x: startPosition.x - tempPageX,
-        y: startPosition.y - tempPageY
+        x: startPosition.pageX - tempCoord.pageX,
+        y: startPosition.pageY - tempCoord.pageY
       };
-      if (isNaN(tempLayerY)) {
-        debugger;
-      }
-      window.form.setAddress(window.pin.address.getX(tempPageX, tempLayerX, mapBlock),
-          window.pin.address.getY(tempPageY, tempLayerY));
+
+      window.form.setAddress(window.pin.address.getX(tempCoord.pageX, tempCoord.layerX, mapBlock),
+          window.pin.address.getY(tempCoord.pageY, tempCoord.layerY));
 
       startPosition = {
-        x: tempPageX,
-        x2: tempLayerX,
-        y: tempPageY,
-        y2: tempLayerY
+        pageX: tempCoord.pageX,
+        layerX: tempCoord.layerX,
+        pageY: tempCoord.pageY,
+        layerY: tempCoord.layerY
       };
-      console.log('startPosition.x ' + startPosition.x + ' startPosition.y ' + startPosition.y);
-      console.log('shift X ' + shift.x + ' Y ' + shift.y);
-      console.log('X ' + window.pin.address.getX(tempPageX, tempLayerX, mapBlock) + ' Y '
-        + window.pin.address.getY(tempPageY, tempLayerY));
-      console.log(' P X ' + evtMove.pageX + ' L X ' + evtMove.layerX + 'P Y ' + evtMove.pageY + ' L Y ' + evtMove.layerY);
-      console.log('Page Y ' + evtMove.pageY + ' tempPageY ' + tempPageY);
-      if ((evtMove.pageX - evtMove.layerX - Math.floor(mapBlock.getBoundingClientRect().left)) < 10) {
-        debugger;
-      }
+      // console.log('startPosition.x ' + startPosition.x + ' startPosition.y ' + startPosition.y);
+      // console.log('shift X ' + shift.x + ' Y ' + shift.y);
+      // console.log('X ' + window.pin.address.getX(tempPageX, tempLayerX, mapBlock) + ' Y '
+      //   + window.pin.address.getY(tempPageY, tempLayerY));
+      // console.log(' P X ' + evtMove.pageX + ' L X ' + evtMove.layerX + 'P Y ' + evtMove.pageY + ' L Y ' + evtMove.layerY);
+      // console.log('Page Y ' + evtMove.pageY + ' tempPageY ' + tempPageY);
+      // if ((evtMove.pageX - evtMove.layerX - Math.floor(mapBlock.getBoundingClientRect().left)) < 10) {
+      //   debugger;
+      // }
       window.pin.move(buttonOfMapActivation, shift);
 
     };
