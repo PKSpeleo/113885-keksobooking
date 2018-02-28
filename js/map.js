@@ -150,40 +150,26 @@
     var onMouseMove = function (evtMove) {
       evtMove.preventDefault();
       var tempCoord = {};
-      tempCoord.layerY = startPosition.layerY;
-      tempCoord.layerX = startPosition.layerX;
-      if (window.pin.address.getY(evtMove.pageY, tempCoord.layerY) > PIN_LIMIT.down) {
+
+      if ((window.pin.address.getY(evtMove.pageY, startPosition.layerY) > PIN_LIMIT.down) ||
+        (window.pin.address.getY(evtMove.pageY, startPosition.layerY) < PIN_LIMIT.up)) {
         tempCoord.pageY = startPosition.pageY;
         tempCoord.pageX = startPosition.pageX;
       } else {
         tempCoord.pageX = evtMove.pageX;
         tempCoord.pageY = evtMove.pageY;
-        // tempCoord.layerY = evtMove.layerY;
-        // tempCoord.layerX = evtMove.layerX;
       }
       var shift = {
         x: startPosition.pageX - tempCoord.pageX,
         y: startPosition.pageY - tempCoord.pageY
       };
 
-      window.form.setAddress(window.pin.address.getX(tempCoord.pageX, tempCoord.layerX, mapBlock),
-          window.pin.address.getY(tempCoord.pageY, tempCoord.layerY));
+      window.form.setAddress(window.pin.address.getX(tempCoord.pageX, startPosition.layerX, mapBlock),
+          window.pin.address.getY(tempCoord.pageY, startPosition.layerY));
 
-      startPosition = {
-        pageX: tempCoord.pageX,
-        layerX: tempCoord.layerX,
-        pageY: tempCoord.pageY,
-        layerY: tempCoord.layerY
-      };
-      // console.log('startPosition.x ' + startPosition.x + ' startPosition.y ' + startPosition.y);
-      // console.log('shift X ' + shift.x + ' Y ' + shift.y);
-      // console.log('X ' + window.pin.address.getX(tempPageX, tempLayerX, mapBlock) + ' Y '
-      //   + window.pin.address.getY(tempPageY, tempLayerY));
-      // console.log(' P X ' + evtMove.pageX + ' L X ' + evtMove.layerX + 'P Y ' + evtMove.pageY + ' L Y ' + evtMove.layerY);
-      // console.log('Page Y ' + evtMove.pageY + ' tempPageY ' + tempPageY);
-      // if ((evtMove.pageX - evtMove.layerX - Math.floor(mapBlock.getBoundingClientRect().left)) < 10) {
-      //   debugger;
-      // }
+      startPosition.pageX = tempCoord.pageX;
+      startPosition.pageY = tempCoord.pageY;
+
       window.pin.move(buttonOfMapActivation, shift);
 
     };
