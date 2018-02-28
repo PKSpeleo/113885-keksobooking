@@ -7,6 +7,11 @@
     y: 35,
     mainY: 49
   };
+  // Ограничение на установку своего маркера
+  var Y_LIMIT = {
+    up: 150,
+    down: 500
+  };
   // находим шаблон
   var templateFragment = document.querySelector('template').content;
 
@@ -74,25 +79,44 @@
     AddressFromMouseEvent: {
       /**
        * Функция высчитывает координаты в системе карты из события
-       * @param {object} mouseEvent - событие мыши
+       * @param {number} pageX - координата У относительно страницы
+       * @param {number} layerX - координата У относительно метки
        * @param {object} mapBlock - блок пина
        * @return {number} - координата в системе карты
        */
-      getX: function (mouseEvent, mapBlock) {
-        return (mouseEvent.pageX - mouseEvent.layerX - Math.floor(mapBlock.getBoundingClientRect().left));
+      getX: function (pageX, layerX, mapBlock) {
+        return (pageX - layerX - Math.floor(mapBlock.getBoundingClientRect().left));
       },
       /**
        * Функция высчитывает координаты в системе карты из события
-       * @param {object} mouseEvent - событие мыши
+       * @param {number} pageY - координата У относительно страницы
+       * @param {number} layerY - координата У относительно метки
        * @return {number} - координата в системе карты
        */
-      getY: function (mouseEvent) {
-        return (mouseEvent.pageY + MAP_MARKER_OFFSET.mainY - mouseEvent.layerY);
+      getY: function (pageY, layerY) {
+        if (isNaN(pageY + MAP_MARKER_OFFSET.mainY - layerY)) {
+          debugger;
+        }
+        return (pageY + MAP_MARKER_OFFSET.mainY - layerY);
       }
     },
+    /**
+     * Функция перемещает наш маркет
+     * @param {object} button - объект кнопки
+     * @param {object} shift - объект со смещениями
+     */
     move: function (button, shift) {
       button.style.top = (button.offsetTop - shift.y) + 'px';
       button.style.left = (button.offsetLeft - shift.x) + 'px';
+    },
+    /**
+     * Функция проверяет в нужных ли пределах значение Y
+     * @param {object} event - событие мыши
+     * @return {boolean} - в пределах - тру, за пределами фалс
+     */
+    checkYIsItInLimits: function (event) {
+      return (window.pin.AddressFromMouseEvent.getY(event) >= Y_LIMIT.up) &&
+        (window.pin.AddressFromMouseEvent.getY(event) <= Y_LIMIT.down);
     }
   };
 })();

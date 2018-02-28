@@ -132,37 +132,69 @@
 
   // move
 
-  // var bodyBlock = document.querySelector('body');
   var onButtonMouseDown = function (evtDown) {
-    // evtDown.preventDefault();
+    evtDown.preventDefault();
     var startPosition = {
       x: evtDown.pageX,
-      y: evtDown.pageY
+      x2: evtDown.layerX,
+      y: evtDown.pageY,
+      y2: evtDown.layerY
     };
+
     var onMouseMove = function (evtMove) {
-      // evtMove.preventDefault();
+      evtMove.preventDefault();
+
+      if (evtMove.pageY > 500) {
+        var tempPageY = startPosition.y;
+        var tempPageX = startPosition.x;
+        var tempLayerY = startPosition.y2;
+        var tempLayerX = startPosition.x2;
+      } else {
+        tempPageX = evtMove.pageX;
+        tempPageY = evtMove.pageY;
+        tempLayerY = evtMove.layerY;
+        tempLayerX = evtMove.layerX;
+      }
       var shift = {
-        x: startPosition.x - evtMove.pageX,
-        y: startPosition.y - evtMove.pageY
+        x: startPosition.x - tempPageX,
+        y: startPosition.y - tempPageY
       };
-      window.form.setAddress(window.pin.AddressFromMouseEvent.getX(evtMove, mapBlock), window.pin.AddressFromMouseEvent.getY(evtMove));
+      if (isNaN(tempLayerY)) {
+        debugger;
+      }
+      window.form.setAddress(window.pin.AddressFromMouseEvent.getX(tempPageX, tempLayerX, mapBlock),
+          window.pin.AddressFromMouseEvent.getY(tempPageY, tempLayerY));
 
       startPosition = {
-        x: evtMove.pageX,
-        y: evtMove.pageY
+        x: tempPageX,
+        x2: tempLayerX,
+        y: tempPageY,
+        y2: tempLayerY
       };
-
+      console.log('startPosition.x ' + startPosition.x + ' startPosition.y ' + startPosition.y);
+      console.log('shift X ' + shift.x + ' Y ' + shift.y);
+      console.log('X ' + window.pin.AddressFromMouseEvent.getX(tempPageX, tempLayerX, mapBlock) + ' Y '
+        + window.pin.AddressFromMouseEvent.getY(tempPageY, tempLayerY));
+      console.log(' P X ' + evtMove.pageX + ' L X ' + evtMove.layerX + 'P Y ' + evtMove.pageY + ' L Y ' + evtMove.layerY);
+      console.log('Page Y ' + evtMove.pageY + ' tempPageY ' + tempPageY);
+      if ((evtMove.pageX - evtMove.layerX - Math.floor(mapBlock.getBoundingClientRect().left)) < 10) {
+        debugger;
+      }
       window.pin.move(buttonOfMapActivation, shift);
 
     };
     var onMouseUpAfterMove = function (evtMouse) {
       mapBlock.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUpAfterMove);
-      window.form.setAddress(window.pin.AddressFromMouseEvent.getX(evtMouse, mapBlock), window.pin.AddressFromMouseEvent.getY(evtMouse));
+      // window.form.setAddress(window.pin.AddressFromMouseEvent.getX(evtMouse, mapBlock), window.pin.AddressFromMouseEvent.getY(evtMouse));
     };
 
     mapBlock.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUpAfterMove);
+    // var setListenerOnMouseMove = function (startPositionInside) {
+    //
+    // };
+    // setListenerOnMouseMove(startPosition);
   };
   buttonOfMapActivation.addEventListener('mousedown', onButtonMouseDown);
   // debugger;
@@ -170,6 +202,6 @@
 
   // Корректируем форму
   window.form.init();
-})();
 
+})();
 
