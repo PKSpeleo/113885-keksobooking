@@ -138,59 +138,85 @@
     }
   };
 
-  // move
-
+  /**
+   * Функция - обработчик события движения начиная с нажатия кнопки мыши
+   * @param {object} evtDown - объект с данными о событии нажатия
+   */
   var onButtonMouseDown = function (evtDown) {
+    // На всякий пожарный
     evtDown.preventDefault();
+
+    // Запоминаем начальные координаты клика
     var startPosition = {
+      // Где нажали относительно страницы
       pageX: evtDown.pageX,
-      layerX: evtDown.layerX,
       pageY: evtDown.pageY,
+      // Где нажали относительно нажатого элемента
+      layerX: evtDown.layerX,
       layerY: evtDown.layerY
     };
 
+    /**
+     * Функция - обработчик событияя движения мыши
+     * @param {object} evtMove - объект с данными о событии
+     */
     var onMouseMove = function (evtMove) {
+      // На всякий пожарный
       evtMove.preventDefault();
+      // Просто создали
       var tempCoord = {};
 
+      // Проверяем на то, в нужных ли пределах наша метка
       if ((window.pin.address.getY(evtMove.pageY, startPosition.layerY) > PIN_LIMIT.down) ||
         (window.pin.address.getY(evtMove.pageY, startPosition.layerY) < PIN_LIMIT.up) ||
         (window.pin.address.getX(evtMove.pageX, startPosition.layerX, mapBlock) < PIN_LIMIT.left) ||
         (window.pin.address.getX(evtMove.pageX, startPosition.layerX, mapBlock) > PIN_LIMIT.right)) {
+        // Если за пределами, то используем старые координаты
         tempCoord.pageY = startPosition.pageY;
         tempCoord.pageX = startPosition.pageX;
       } else {
+        // Если в пределах - то используем новые координаты
         tempCoord.pageX = evtMove.pageX;
         tempCoord.pageY = evtMove.pageY;
       }
+      // Вычисляем смещение. Если новые - то смещаемся. Если старые - то нет.
       var shift = {
         x: startPosition.pageX - tempCoord.pageX,
         y: startPosition.pageY - tempCoord.pageY
       };
 
+      // Заполняем поле адреса
       window.form.setAddress(window.pin.address.getX(tempCoord.pageX, startPosition.layerX, mapBlock),
           window.pin.address.getY(tempCoord.pageY, startPosition.layerY));
 
+      // Переназначем опорные координаты
       startPosition.pageX = tempCoord.pageX;
       startPosition.pageY = tempCoord.pageY;
 
+      // Двигаем пин с помощью вычесленных ранее смещений
       window.pin.move(buttonOfMapActivation, shift);
 
     };
+
+    /**
+     * Функция - обработчик события отпускания мыши после движения
+     */
     var onMouseUpAfterMove = function () {
       mapBlock.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUpAfterMove);
     };
 
+    // Навешиваем обработчик на движение мыши
     mapBlock.addEventListener('mousemove', onMouseMove);
+
+    // Навешиваем обработчик на отпускание кнопки мыши
     document.addEventListener('mouseup', onMouseUpAfterMove);
   };
-  buttonOfMapActivation.addEventListener('mousedown', onButtonMouseDown);
-  // debugger;
 
+  // Навешиваем обработчик на нажатие кнопки мыши
+  buttonOfMapActivation.addEventListener('mousedown', onButtonMouseDown);
 
   // Корректируем форму
   window.form.init();
-
 })();
 
