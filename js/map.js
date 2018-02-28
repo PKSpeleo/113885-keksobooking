@@ -10,12 +10,6 @@
     esc: 27
   };
 
-  // Орграничения положения пина на карте
-  var PIN_LIMIT = {
-    up: 150,
-    down: 500
-  };
-
   // Генерируем обявления
   var adsArrayRandom = window.data.generateAds();
 
