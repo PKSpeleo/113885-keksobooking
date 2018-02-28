@@ -63,7 +63,8 @@
     // Активируем все
     activateAndDrawPins(mapBlock, noticeForm, false);
     // прописываем в поле адрес положение мышки в момент клика
-    window.form.setAddress(window.pin.address.getX(evt.pageX, evt.layerX, mapBlock), window.pin.address.getY(evt.pageY, evt.layerY));
+    window.form.setAddress(window.pin.address.getX(evt.pageX, evt.layerX, mapBlock),
+        window.pin.address.getY(evt.pageY, evt.layerY));
     buttonOfMapActivation.removeEventListener('mouseup', onButtonMouseup);
     buttonOfMapActivation.removeEventListener('keydown', onButtonKeydown);
   };
