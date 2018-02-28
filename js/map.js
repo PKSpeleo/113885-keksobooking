@@ -13,7 +13,9 @@
   // Орграничения положения пина на карте
   var PIN_LIMIT = {
     up: 150,
-    down: 500
+    down: 500,
+    left: 0,
+    right: 1200
   };
 
   // Генерируем обявления
@@ -152,7 +154,9 @@
       var tempCoord = {};
 
       if ((window.pin.address.getY(evtMove.pageY, startPosition.layerY) > PIN_LIMIT.down) ||
-        (window.pin.address.getY(evtMove.pageY, startPosition.layerY) < PIN_LIMIT.up)) {
+        (window.pin.address.getY(evtMove.pageY, startPosition.layerY) < PIN_LIMIT.up) ||
+        (window.pin.address.getX(evtMove.pageX, startPosition.layerX, mapBlock) < PIN_LIMIT.left) ||
+        (window.pin.address.getX(evtMove.pageX, startPosition.layerX, mapBlock) > PIN_LIMIT.right)) {
         tempCoord.pageY = startPosition.pageY;
         tempCoord.pageX = startPosition.pageX;
       } else {
