@@ -150,16 +150,16 @@
     var onMouseMove = function (evtMove) {
       evtMove.preventDefault();
       var tempCoord = {};
-      if (evtMove.pageY > 500) {
+      tempCoord.layerY = startPosition.layerY;
+      tempCoord.layerX = startPosition.layerX;
+      if (window.pin.address.getY(evtMove.pageY, tempCoord.layerY) > PIN_LIMIT.down) {
         tempCoord.pageY = startPosition.pageY;
         tempCoord.pageX = startPosition.pageX;
-        tempCoord.layerY = startPosition.layerY;
-        tempCoord.layerX = startPosition.layerX;
       } else {
         tempCoord.pageX = evtMove.pageX;
         tempCoord.pageY = evtMove.pageY;
-        tempCoord.layerY = evtMove.layerY;
-        tempCoord.layerX = evtMove.layerX;
+        // tempCoord.layerY = evtMove.layerY;
+        // tempCoord.layerX = evtMove.layerX;
       }
       var shift = {
         x: startPosition.pageX - tempCoord.pageX,

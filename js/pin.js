@@ -89,9 +89,6 @@
        * @return {number} - координата в системе карты
        */
       getY: function (pageY, layerY) {
-        if (isNaN(pageY + MAP_MARKER_OFFSET.mainY - layerY)) {
-          debugger;
-        }
         return (pageY + MAP_MARKER_OFFSET.mainY - layerY);
       }
     },
