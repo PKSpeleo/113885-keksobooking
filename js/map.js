@@ -10,6 +10,12 @@
     esc: 27
   };
 
+  // Орграничения положения пина на карте
+  var PIN_LIMIT = {
+    up: 150,
+    down: 500
+  };
+
   // Генерируем обявления
   var adsArrayRandom = window.data.generateAds();
 
@@ -54,11 +60,10 @@
    * @param {object} evt - объектс с данными о событии
    */
   var onButtonMouseup = function (evt) {
+    // Активируем все
     activateAndDrawPins(mapBlock, noticeForm, false);
-    // // прописываем в поле адрес положение мышки в момент клика
-    // addressField.setAttribute(
-    //     'value', evt.pageX + ' , ' + evt.pageY);
-    // Удаляем обработчики
+    // прописываем в поле адрес положение мышки в момент клика
+    window.form.setAddress(window.pin.address.getX(evt.pageX, evt.layerX, mapBlock), window.pin.address.getY(evt.pageY, evt.layerY));
     buttonOfMapActivation.removeEventListener('mouseup', onButtonMouseup);
     buttonOfMapActivation.removeEventListener('keydown', onButtonKeydown);
   };
@@ -162,8 +167,8 @@
       if (isNaN(tempLayerY)) {
         debugger;
       }
-      window.form.setAddress(window.pin.AddressFromMouseEvent.getX(tempPageX, tempLayerX, mapBlock),
-          window.pin.AddressFromMouseEvent.getY(tempPageY, tempLayerY));
+      window.form.setAddress(window.pin.address.getX(tempPageX, tempLayerX, mapBlock),
+          window.pin.address.getY(tempPageY, tempLayerY));
 
       startPosition = {
         x: tempPageX,
@@ -173,8 +178,8 @@
       };
       console.log('startPosition.x ' + startPosition.x + ' startPosition.y ' + startPosition.y);
       console.log('shift X ' + shift.x + ' Y ' + shift.y);
-      console.log('X ' + window.pin.AddressFromMouseEvent.getX(tempPageX, tempLayerX, mapBlock) + ' Y '
-        + window.pin.AddressFromMouseEvent.getY(tempPageY, tempLayerY));
+      console.log('X ' + window.pin.address.getX(tempPageX, tempLayerX, mapBlock) + ' Y '
+        + window.pin.address.getY(tempPageY, tempLayerY));
       console.log(' P X ' + evtMove.pageX + ' L X ' + evtMove.layerX + 'P Y ' + evtMove.pageY + ' L Y ' + evtMove.layerY);
       console.log('Page Y ' + evtMove.pageY + ' tempPageY ' + tempPageY);
       if ((evtMove.pageX - evtMove.layerX - Math.floor(mapBlock.getBoundingClientRect().left)) < 10) {
@@ -183,18 +188,13 @@
       window.pin.move(buttonOfMapActivation, shift);
 
     };
-    var onMouseUpAfterMove = function (evtMouse) {
+    var onMouseUpAfterMove = function () {
       mapBlock.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUpAfterMove);
-      // window.form.setAddress(window.pin.AddressFromMouseEvent.getX(evtMouse, mapBlock), window.pin.AddressFromMouseEvent.getY(evtMouse));
     };
 
     mapBlock.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUpAfterMove);
-    // var setListenerOnMouseMove = function (startPositionInside) {
-    //
-    // };
-    // setListenerOnMouseMove(startPosition);
   };
   buttonOfMapActivation.addEventListener('mousedown', onButtonMouseDown);
   // debugger;

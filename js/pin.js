@@ -7,11 +7,6 @@
     y: 35,
     mainY: 49
   };
-  // Ограничение на установку своего маркера
-  var Y_LIMIT = {
-    up: 150,
-    down: 500
-  };
   // находим шаблон
   var templateFragment = document.querySelector('template').content;
 
@@ -76,7 +71,7 @@
       var mapMarker = mapBlock.querySelector('.map__pins');
       mapMarker.appendChild(mapMarkersFragment);
     },
-    AddressFromMouseEvent: {
+    address: {
       /**
        * Функция высчитывает координаты в системе карты из события
        * @param {number} pageX - координата У относительно страницы
@@ -108,15 +103,6 @@
     move: function (button, shift) {
       button.style.top = (button.offsetTop - shift.y) + 'px';
       button.style.left = (button.offsetLeft - shift.x) + 'px';
-    },
-    /**
-     * Функция проверяет в нужных ли пределах значение Y
-     * @param {object} event - событие мыши
-     * @return {boolean} - в пределах - тру, за пределами фалс
-     */
-    checkYIsItInLimits: function (event) {
-      return (window.pin.AddressFromMouseEvent.getY(event) >= Y_LIMIT.up) &&
-        (window.pin.AddressFromMouseEvent.getY(event) <= Y_LIMIT.down);
     }
   };
 })();
