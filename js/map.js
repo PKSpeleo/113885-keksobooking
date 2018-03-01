@@ -19,7 +19,27 @@
   };
 
   // Генерируем обявления
-  var adsArrayRandom = window.data.generateAds();
+  // var adsArrayRandom = window.data.generateAds();
+  var adsArrayRandom = [];
+
+  var onLoad = function (data) {
+    adsArrayRandom = window.data.generateAds();
+    window.pin.drawPins(adsArrayRandom, mapBlock);
+    // Вешаем обработчик клика по карте в поисках метки
+    mapBlock.addEventListener('click', onMapClick);
+  };
+
+  var onError = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: gray;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
 
   // Ищим блок с картой
   var mapBlock = document.querySelector('.map');
@@ -51,9 +71,7 @@
   var activateAndDrawPins = function (blockOfMap, blockOfForm, status) {
     window.activation.setActiveOrInactivePage(blockOfMap, blockOfForm, status);
     if (!status) {
-      window.pin.drawPins(adsArrayRandom, mapBlock);
-      // Вешаем обработчик клика по карте в поисках метки
-      mapBlock.addEventListener('click', onMapClick);
+      window.backend.download(onLoad, onError);
     }
   };
 
