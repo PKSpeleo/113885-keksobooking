@@ -20,26 +20,35 @@
 
   // Генерируем обявления
   // var adsArrayRandom = window.data.generateAds();
-  var adsArrayRandom = [];
+  var adsArray = [];
 
-  var onLoad = function (data) {
-    adsArrayRandom = window.data.generateAds();
-    window.pin.drawPins(adsArrayRandom, mapBlock);
+  var onLoad = function (dataFromServer) {
+    adsArray = dataFromServer;
+    window.pin.drawPins(adsArray, mapBlock);
+    debugger;
     // Вешаем обработчик клика по карте в поисках метки
     mapBlock.addEventListener('click', onMapClick);
   };
 
   var onError = function (errorMessage) {
     var node = document.createElement('div');
-    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: gray;';
-    node.style.position = 'absolute';
-    node.style.left = 0;
-    node.style.right = 0;
+    node.classList.add('error-window');
+    node.style = 'z-index: 100; text-align: center; background-color: red; padding: 50px;';
+    node.style.position = 'fixed';
+    node.style.transform = 'translate(-50%, -50%)';
+    node.style.top = '200px';
+    node.style.width = '800px';
+    node.style.left = '50%';
     node.style.fontSize = '30px';
-
+    node.style.color = 'white';
     node.textContent = errorMessage;
     document.body.insertAdjacentElement('afterbegin', node);
+    var hideErrorWindow = function () {
+      document.querySelector('.error-window').remove();
+    };
+    window.setTimeout(hideErrorWindow, 5000);
   };
+
 
   // Ищим блок с картой
   var mapBlock = document.querySelector('.map');
@@ -70,9 +79,6 @@
    */
   var activateAndDrawPins = function (blockOfMap, blockOfForm, status) {
     window.activation.setActiveOrInactivePage(blockOfMap, blockOfForm, status);
-    if (!status) {
-      window.backend.download(onLoad, onError);
-    }
   };
 
   /**
@@ -81,6 +87,7 @@
    */
   var onButtonMouseup = function (evt) {
     // Активируем все
+    window.backend.download(onLoad, onError);
     activateAndDrawPins(mapBlock, noticeForm, false);
     // прописываем в поле адрес положение мышки в момент клика
     window.form.setAddress(window.pin.address.getX(evt.pageX, evt.layerX, mapBlock),
@@ -95,6 +102,7 @@
    */
   var onButtonKeydown = function (evt) {
     if (evt.keyCode === KEY_CODES.enter) {
+      window.backend.download(onLoad, onError);
       window.activation.setActiveOrInactivePage(mapBlock, noticeForm, false);
       // Удаляем обработчики
       buttonOfMapActivation.removeEventListener('mouseup', onButtonMouseup);
@@ -134,7 +142,7 @@
         evt.target.parentNode.dataset.addId;
       // Создаем и заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
       var mapCardFragment = window.card.createMapCardElement(
-          adsArrayRandom[addIndex], mapCardTemplate);
+          adsArray[addIndex], mapCardTemplate);
       // Находим, куда засовывать фрагмент с диалогом
       var mapFiltersContainer = document.querySelector('.map__filters-container');
       // Проверяем, открыта ли карточка. Если открыта, то удаляем перед отрисовкой новой.
