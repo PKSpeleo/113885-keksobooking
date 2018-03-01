@@ -14,8 +14,8 @@
     right: 1200
   };
 
-  // Пусть будет!
-  // var adsArray = [];
+  // Пусть будет видна во всем map.js!
+  var adsArray = [];
 
   // Ищим блок с картой
   var mapBlock = document.querySelector('.map');
@@ -228,7 +228,7 @@
    * @param {object} dataFromServer - объект с данными ответа сервера
    */
   var onLoad = function (dataFromServer) {
-    var adsArray = dataFromServer;
+    adsArray = dataFromServer;
     window.pin.drawPins(adsArray, mapBlock);
     // Вешаем обработчик клика по карте в поисках метки
     mapBlock.addEventListener('click', onMapClick);
@@ -279,7 +279,6 @@
    */
   var onUpload = function () {
     resetAll();
-    console.log('otparavili');
   };
 
   /**
@@ -304,7 +303,6 @@
   var onResetButtonClick = function (evt) {
     evt.preventDefault();
     resetAll();
-    console.log('sbrosil');
   };
   // Вешаем обработчик на клик по сбросу
   resetButton.addEventListener('click', onResetButtonClick);

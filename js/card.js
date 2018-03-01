@@ -24,7 +24,8 @@
     for (var i = 0; i < picArray.length; i++) {
       var newLiListElement = liListElement.cloneNode(true);
       newLiListElement.querySelector('img').setAttribute('src', picArray[i]);
-      newLiListElement.querySelector('img').setAttribute('width', '70');
+      newLiListElement.querySelector('img').setAttribute('width', '40');
+      newLiListElement.querySelector('img').setAttribute('height', '40');
       listBlock.appendChild(newLiListElement);
     }
   };

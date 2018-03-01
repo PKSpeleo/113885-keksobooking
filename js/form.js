@@ -1,13 +1,11 @@
 'use strict';
 (function () {
   // Мапа для типов жидищь
-  var FlatType = {
-    PRICE_MIN: {
-      flat: 1000,
-      bungalo: 0,
-      house: 5000,
-      palace: 10000
-    }
+  var PRICE_MIN = {
+    flat: 1000,
+    bungalo: 0,
+    house: 5000,
+    palace: 10000
   };
   var MAIN_PIN = {
     x: 602,
@@ -219,7 +217,7 @@
      * Функция инициализации карты
      */
     init: function () {
-      checkAndChangeNoticeForm(noticeFormBlock, FlatType.PRICE_MIN);
+      checkAndChangeNoticeForm(noticeFormBlock, PRICE_MIN);
     },
     /**
      * Функция, отлючающая или включающая возможность заполнения форм
