@@ -7,6 +7,10 @@
     y: 35,
     mainY: 45
   };
+  var MAIN_PIN = {
+    x: 602,
+    y: 425
+  };
   // находим шаблон
   var templateFragment = document.querySelector('template').content;
 
@@ -57,6 +61,14 @@
     return domBlock;
   };
   window.pin = {
+    /**
+     * Функция сброса положения основной метки в начальное положение
+     * @param {object} button - сам основной пин
+     */
+    resetMain: function (button) {
+      button.style.left = MAIN_PIN.x;
+      button.style.top = MAIN_PIN.y;
+    },
     /**
      * Функуия рисует пины на карте на основе массива с рандомными
      * объявлениями в блоке карт

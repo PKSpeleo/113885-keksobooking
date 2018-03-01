@@ -1,9 +1,5 @@
 'use strict';
 (function () {
-  var INIT_ADDRESS = {
-    x: 600,
-    y: 352
-  };
   // Коды клавиатуры
   var KEY_CODES = {
     enter: 13,
@@ -83,11 +79,6 @@
 
   // Для начала делаем страницу неактивной.
   window.activation.setActiveOrInactivePage(mapBlock, noticeForm, true);
-
-  // Прописываем начальный адрес
-  // document.querySelector('#address').setAttribute('value', '600, 375');
-  // debugger;
-  window.form.setAddress(INIT_ADDRESS.x, INIT_ADDRESS.y);
 
   // Вешаем обработчик на нажатие клавиши ENTER по кнопке активации карты
   buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
@@ -242,7 +233,15 @@
     window.setTimeout(hideErrorWindow, 5000);
   };
 
+
+  var resetAll = function () {
+    noticeForm.reset();
+    window.form.init();
+    window.pin.resetMain(buttonOfMapActivation);
+  };
+
   var onUpload = function () {
+    resetAll();
     console.log('otparavili');
   };
 

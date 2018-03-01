@@ -9,6 +9,10 @@
       palace: 10000
     }
   };
+  var MAIN_PIN = {
+    x: 602,
+    y: 425
+  };
   // Где же блок адреса
   var addressBlock = document.querySelector('#address');
   /**
@@ -23,7 +27,8 @@
     titleField.setAttribute('required', '');
     titleField.setAttribute('minlength', '30');
     titleField.setAttribute('maxlength', '100');
-
+    // Прописываем начальный адрес
+    window.form.setAddress(MAIN_PIN.x, MAIN_PIN.y);
     // Где же поле цены?
     var priceInput = blockDom.querySelector('#price');
     // Правим статичные атрибуты цены
