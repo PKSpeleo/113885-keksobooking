@@ -14,6 +14,9 @@
     right: 1200
   };
 
+  // Сколько висит окно с ошибкой
+  var TIMEOUT_FOR_ERROR = 10000;
+
   // Пусть будет видна во всем map.js!
   var adsArray = [];
 
@@ -199,7 +202,6 @@
 
       // Двигаем пин с помощью вычесленных ранее смещений
       window.pin.move(buttonOfMapActivation, shift);
-
     };
 
     /**
@@ -254,7 +256,7 @@
     var hideErrorWindow = function () {
       document.querySelector('.error-window').remove();
     };
-    window.setTimeout(hideErrorWindow, 5000);
+    window.setTimeout(hideErrorWindow, TIMEOUT_FOR_ERROR);
   };
 
   /**

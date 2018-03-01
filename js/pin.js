@@ -61,6 +61,10 @@
     return domBlock;
   };
   window.pin = {
+    /**
+     * Функция, которая удаляет все пины кроме главного
+     * @param {object} mapBlock - блок карты
+     */
     deleteAllSimilarPins: function (mapBlock) {
       mapBlock.querySelectorAll('.map__pin').forEach(function (value) {
         if (!(value.classList.contains('map__pin--main'))) {

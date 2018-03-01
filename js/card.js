@@ -1,12 +1,10 @@
 'use strict';
 (function () {
   // Мапа для типов жидищь
-  var FlatType = {
-    TRANSLATE: {
-      flat: 'Квартира',
-      house: 'Дом',
-      bungalo: 'Бунгало'
-    }
+  var TRANSLATE = {
+    flat: 'Квартира',
+    house: 'Дом',
+    bungalo: 'Бунгало'
   };
   /**
    * Функция, заполняющая блок (из шаблона) элементами списка с картинками согласно исходному массиву
@@ -63,7 +61,7 @@
       // Правим цену
       newElement.querySelector('.popup__price').textContent = adsObject.offer.price + ' ₽/ночь';
       // Правим тим жилища
-      newElement.querySelector('h4').textContent = FlatType.TRANSLATE[adsObject.offer.type];
+      newElement.querySelector('h4').textContent = TRANSLATE[adsObject.offer.type];
       // Ищем по 'p'
       var paragraphOfElement = newElement.querySelectorAll('p');
       // Правим данные о комнатах и гостях
