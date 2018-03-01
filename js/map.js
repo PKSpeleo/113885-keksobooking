@@ -48,7 +48,7 @@
    * @param {boolean} deactivation - Если True - то деактивирована, если False - активирована;)
    */
   var deactivateAllPage = function (blockOfMap, blockOfForm, deactivation) {
-    setOrRemoveClassMapFaded(blockOfMap, deactivation);
+    fadeMap(blockOfMap, deactivation);
     window.form.blockFormFields(blockOfForm, deactivation);
     window.form.fadeFormFields(blockOfForm, deactivation);
   };
@@ -59,7 +59,7 @@
    * @param {object} block - блок для манипуляций
    * @param {boolean} deactivation - видно или нет
    */
-  var setOrRemoveClassMapFaded = function (block, deactivation) {
+  var fadeMap = function (block, deactivation) {
     if (deactivation) {
       block.classList.add('map--faded');
     } else {
