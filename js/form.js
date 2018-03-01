@@ -220,6 +220,36 @@
      */
     init: function () {
       checkAndChangeNoticeForm(noticeFormBlock, FlatType.PRICE_MIN);
+    },
+    /**
+     * Функция, отлючающая или включающая возможность заполнения форм
+     * удаляя или добавляя атрибут disabled в fieldset
+     * @param {object} block - блок, в котором мы отключаем
+     * @param {boolean} status - добавлен атрибут или нет
+     */
+    setOrRemoveAttributeDisable: function (block, status) {
+      var fieldset = block.querySelectorAll('fieldset');
+      if (status) {
+        fieldset.forEach(function (value) {
+          value.setAttribute('disabled', '');
+        });
+      } else {
+        fieldset.forEach(function (value) {
+          value.removeAttribute('disabled', '');
+        });
+      }
+    },
+    /**
+     * Функция, которая удаляет или добавля класс notice__form--disabled
+     * @param {object} block - блок в котором меняем класс
+     * @param {boolean} status - есть класс или нет
+     */
+    setOrRemoveClassNoticeFormDisabled: function (block, status) {
+      if (status) {
+        block.classList.add('notice__form--disabled');
+      } else {
+        block.classList.remove('notice__form--disabled');
+      }
     }
   };
 })();

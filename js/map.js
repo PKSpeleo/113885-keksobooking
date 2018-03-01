@@ -15,7 +15,7 @@
   };
 
   // Пусть будет!
-  var adsArray = [];
+  // var adsArray = [];
 
   // Ищим блок с картой
   var mapBlock = document.querySelector('.map');
@@ -44,8 +44,24 @@
    * @param {object} blockOfForm - блок формы
    * @param {boolean} status - Если True - то видно, если False - то нет;)
    */
-  var activateAndDrawPins = function (blockOfMap, blockOfForm, status) {
-    window.activation.setActiveOrInactivePage(blockOfMap, blockOfForm, status);
+  var deactivateAllPage = function (blockOfMap, blockOfForm, status) {
+    setOrRemoveClassMapFaded(blockOfMap, status);
+    window.form.setOrRemoveAttributeDisable(blockOfForm, status);
+    window.form.setOrRemoveClassNoticeFormDisabled(blockOfForm, status);
+  };
+
+  /**
+   * Функция, которая скрывает или показывает блок карты, удаляя или добавляя
+   * класс 'map--faded'
+   * @param {object} block - блок для манипуляций
+   * @param {boolean} status - видно или нет
+   */
+  var setOrRemoveClassMapFaded = function (block, status) {
+    if (status) {
+      block.classList.add('map--faded');
+    } else {
+      block.classList.remove('map--faded');
+    }
   };
 
   /**
@@ -55,7 +71,7 @@
   var onButtonMouseup = function (evt) {
     // Активируем все
     window.backend.download(onLoad, onError);
-    activateAndDrawPins(mapBlock, noticeForm, false);
+    deactivateAllPage(mapBlock, noticeForm, false);
     // прописываем в поле адрес положение мышки в момент клика
     window.form.setAddress(window.pin.address.getX(evt.pageX, evt.layerX, mapBlock),
         window.pin.address.getY(evt.pageY, evt.layerY));
@@ -70,7 +86,7 @@
   var onButtonKeydown = function (evt) {
     if (evt.keyCode === KEY_CODES.enter) {
       window.backend.download(onLoad, onError);
-      window.activation.setActiveOrInactivePage(mapBlock, noticeForm, false);
+      deactivateAllPage(mapBlock, noticeForm, false);
       // Удаляем обработчики
       buttonOfMapActivation.removeEventListener('mouseup', onButtonMouseup);
       buttonOfMapActivation.removeEventListener('keydown', onButtonKeydown);
@@ -78,7 +94,7 @@
   };
 
   // Для начала делаем страницу неактивной.
-  window.activation.setActiveOrInactivePage(mapBlock, noticeForm, true);
+  deactivateAllPage(mapBlock, noticeForm, true);
 
   // Вешаем обработчик на нажатие клавиши ENTER по кнопке активации карты
   buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
@@ -207,13 +223,21 @@
   // Корректируем форму
   window.form.init();
 
+  /**
+   * Функция, запускаемая успешному окончанию скачивания
+   * @param {object} dataFromServer - объект с данными ответа сервера
+   */
   var onLoad = function (dataFromServer) {
-    adsArray = dataFromServer;
+    var adsArray = dataFromServer;
     window.pin.drawPins(adsArray, mapBlock);
     // Вешаем обработчик клика по карте в поисках метки
     mapBlock.addEventListener('click', onMapClick);
   };
 
+  /**
+   * Функция рисует сообщение с текстом
+   * @param {string} errorMessage - текст сообщения
+   */
   var onError = function (errorMessage) {
     var node = document.createElement('div');
     node.classList.add('error-window');
@@ -233,24 +257,57 @@
     window.setTimeout(hideErrorWindow, 5000);
   };
 
-
+  /**
+   * Функция сброса всего в исходное состояние
+   */
   var resetAll = function () {
     noticeForm.reset();
     window.form.init();
     window.pin.resetMain(buttonOfMapActivation);
+    deactivateAllPage(mapBlock, noticeForm, true);
+    window.pin.deleteAllSimilarPins(mapBlock);
+    // Вешаем обработчик на нажатие клавиши ENTER по кнопке активации карты
+    buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
+    // Вешаем обработчик событий на клик по кнопке активации карты
+    buttonOfMapActivation.addEventListener('mouseup', onButtonMouseup);
+    // Навешиваем обработчик на нажатие кнопки мыши
+    buttonOfMapActivation.addEventListener('mousedown', onButtonMouseDown);
   };
 
+  /**
+   * Функция, запускаемая при успешной отправке данных
+   */
   var onUpload = function () {
     resetAll();
     console.log('otparavili');
   };
 
+  /**
+   * Функця - обработчик события клика по отправке
+   * @param {object} evt - объект с данными о событии.
+   */
   var onButtonSubmitClick = function (evt) {
     evt.preventDefault();
     window.backend.upload(new FormData(noticeForm), onUpload, onError);
   };
 
+  // Навешиваем обработчик события на кнопку подтердить отпраку
   noticeForm.addEventListener('submit', onButtonSubmitClick);
+
+  // Где же кнопка сброса
+  var resetButton = noticeForm.querySelector('.form__reset');
+
+  /**
+   * Функция - обработчик события клика по сбросу
+   * @param {object} evt - объект с данными о событии
+   */
+  var onResetButtonClick = function (evt) {
+    evt.preventDefault();
+    resetAll();
+    console.log('sbrosil');
+  };
+  // Вешаем обработчик на клик по сбросу
+  resetButton.addEventListener('click', onResetButtonClick);
 
 })();
 
