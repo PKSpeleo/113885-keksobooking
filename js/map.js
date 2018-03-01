@@ -45,22 +45,22 @@
    * Функция акивации и деактивации страницы
    * @param {object} blockOfMap - блок карты
    * @param {object} blockOfForm - блок формы
-   * @param {boolean} status - Если True - то деактивирована, если False - активирована;)
+   * @param {boolean} deactivation - Если True - то деактивирована, если False - активирована;)
    */
-  var deactivateAllPage = function (blockOfMap, blockOfForm, status) {
-    setOrRemoveClassMapFaded(blockOfMap, status);
-    window.form.setOrRemoveAttributeDisable(blockOfForm, status);
-    window.form.setOrRemoveClassNoticeFormDisabled(blockOfForm, status);
+  var deactivateAllPage = function (blockOfMap, blockOfForm, deactivation) {
+    setOrRemoveClassMapFaded(blockOfMap, deactivation);
+    window.form.blockFormFields(blockOfForm, deactivation);
+    window.form.fadeFormFields(blockOfForm, deactivation);
   };
 
   /**
    * Функция, которая скрывает или показывает блок карты, удаляя или добавляя
    * класс 'map--faded'
    * @param {object} block - блок для манипуляций
-   * @param {boolean} status - видно или нет
+   * @param {boolean} deactivation - видно или нет
    */
-  var setOrRemoveClassMapFaded = function (block, status) {
-    if (status) {
+  var setOrRemoveClassMapFaded = function (block, deactivation) {
+    if (deactivation) {
       block.classList.add('map--faded');
     } else {
       block.classList.remove('map--faded');

@@ -221,13 +221,14 @@
     },
     /**
      * Функция, отлючающая или включающая возможность заполнения форм
+     * (в форме блокирует все поля)
      * удаляя или добавляя атрибут disabled в fieldset
      * @param {object} block - блок, в котором мы отключаем
-     * @param {boolean} status - добавлен атрибут или нет
+     * @param {boolean} deactivation - добавлен атрибут или нет
      */
-    setOrRemoveAttributeDisable: function (block, status) {
+    blockFormFields: function (block, deactivation) {
       var fieldset = block.querySelectorAll('fieldset');
-      if (status) {
+      if (deactivation) {
         fieldset.forEach(function (value) {
           value.setAttribute('disabled', '');
         });
@@ -239,11 +240,12 @@
     },
     /**
      * Функция, которая удаляет или добавля класс notice__form--disabled
+     * (затемняет форму)
      * @param {object} block - блок в котором меняем класс
-     * @param {boolean} status - есть класс или нет
+     * @param {boolean} deactivation - есть класс или нет
      */
-    setOrRemoveClassNoticeFormDisabled: function (block, status) {
-      if (status) {
+    fadeFormFields: function (block, deactivation) {
+      if (deactivation) {
         block.classList.add('notice__form--disabled');
       } else {
         block.classList.remove('notice__form--disabled');
