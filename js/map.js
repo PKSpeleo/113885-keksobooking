@@ -18,37 +18,8 @@
     right: 1200
   };
 
-  // Генерируем обявления
-  // var adsArrayRandom = window.data.generateAds();
+  // Пусть будет!
   var adsArray = [];
-
-  var onLoad = function (dataFromServer) {
-    adsArray = dataFromServer;
-    window.pin.drawPins(adsArray, mapBlock);
-    debugger;
-    // Вешаем обработчик клика по карте в поисках метки
-    mapBlock.addEventListener('click', onMapClick);
-  };
-
-  var onError = function (errorMessage) {
-    var node = document.createElement('div');
-    node.classList.add('error-window');
-    node.style = 'z-index: 100; text-align: center; background-color: red; padding: 50px;';
-    node.style.position = 'fixed';
-    node.style.transform = 'translate(-50%, -50%)';
-    node.style.top = '200px';
-    node.style.width = '800px';
-    node.style.left = '50%';
-    node.style.fontSize = '30px';
-    node.style.color = 'white';
-    node.textContent = errorMessage;
-    document.body.insertAdjacentElement('afterbegin', node);
-    var hideErrorWindow = function () {
-      document.querySelector('.error-window').remove();
-    };
-    window.setTimeout(hideErrorWindow, 5000);
-  };
-
 
   // Ищим блок с картой
   var mapBlock = document.querySelector('.map');
@@ -244,5 +215,43 @@
 
   // Корректируем форму
   window.form.init();
+
+  var onLoad = function (dataFromServer) {
+    adsArray = dataFromServer;
+    window.pin.drawPins(adsArray, mapBlock);
+    // Вешаем обработчик клика по карте в поисках метки
+    mapBlock.addEventListener('click', onMapClick);
+  };
+
+  var onError = function (errorMessage) {
+    var node = document.createElement('div');
+    node.classList.add('error-window');
+    node.style = 'z-index: 100; text-align: center; background-color: red; padding: 50px;';
+    node.style.position = 'fixed';
+    node.style.left = '50%';
+    node.style.transform = 'translate(-50%, -50%)';
+    node.style.top = '150px';
+    node.style.width = '800px';
+    node.style.fontSize = '30px';
+    node.style.color = 'white';
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+    var hideErrorWindow = function () {
+      document.querySelector('.error-window').remove();
+    };
+    window.setTimeout(hideErrorWindow, 5000);
+  };
+
+  var onUpload = function () {
+    console.log('otparavili');
+  };
+
+  var onButtonSubmitClick = function (evt) {
+    evt.preventDefault();
+    window.backend.upload(new FormData(noticeForm), onUpload, onError);
+  };
+
+  noticeForm.addEventListener('submit', onButtonSubmitClick);
+
 })();
 
