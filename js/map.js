@@ -222,7 +222,7 @@
    */
   var onLoad = function (dataFromServer) {
     adsArray = dataFromServer;
-    window.pin.drawPins(adsArray, mapBlock);
+    window.pin.draw(adsArray, mapBlock);
     // Вешаем обработчик клика по карте в поисках метки
     mapBlock.addEventListener('click', onMapClick);
   };
