@@ -7,6 +7,10 @@
     y: 35,
     mainY: 45
   };
+  var MAIN_PIN = {
+    x: '600',
+    y: '420'
+  };
   // находим шаблон
   var templateFragment = document.querySelector('template').content;
 
@@ -57,6 +61,25 @@
     return domBlock;
   };
   window.pin = {
+    /**
+     * Функция, которая удаляет все пины кроме главного
+     * @param {object} mapBlock - блок карты
+     */
+    deleteAllSimilarPins: function (mapBlock) {
+      mapBlock.querySelectorAll('.map__pin').forEach(function (value) {
+        if (!(value.classList.contains('map__pin--main'))) {
+          value.remove();
+        }
+      });
+    },
+    /**
+     * Функция сброса положения основной метки в начальное положение
+     * @param {object} button - сам основной пин
+     */
+    resetMain: function (button) {
+      button.style.left = MAIN_PIN.x + 'px';
+      button.style.top = MAIN_PIN.y - MAP_MARKER_OFFSET.mainY + 'px';
+    },
     /**
      * Функуия рисует пины на карте на основе массива с рандомными
      * объявлениями в блоке карт

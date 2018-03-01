@@ -1,12 +1,10 @@
 'use strict';
 (function () {
   // Мапа для типов жидищь
-  var FlatType = {
-    TRANSLATE: {
-      flat: 'Квартира',
-      house: 'Дом',
-      bungalo: 'Бунгало'
-    }
+  var TRANSLATE = {
+    flat: 'Квартира',
+    house: 'Дом',
+    bungalo: 'Бунгало'
   };
   /**
    * Функция, заполняющая блок (из шаблона) элементами списка с картинками согласно исходному массиву
@@ -24,7 +22,8 @@
     for (var i = 0; i < picArray.length; i++) {
       var newLiListElement = liListElement.cloneNode(true);
       newLiListElement.querySelector('img').setAttribute('src', picArray[i]);
-      newLiListElement.querySelector('img').setAttribute('width', '70');
+      newLiListElement.querySelector('img').setAttribute('width', '40');
+      newLiListElement.querySelector('img').setAttribute('height', '40');
       listBlock.appendChild(newLiListElement);
     }
   };
@@ -43,6 +42,12 @@
     }
   };
   window.card = {
+    close: function (mapBlock) {
+      var popup = mapBlock.querySelector('.popup');
+      if (popup) {
+        mapBlock.removeChild(popup);
+      }
+    },
     /**
      * Функция создает DOM элемент карточки на основе JS объекта, шаблона
      * и вариантов перевода;_
@@ -62,7 +67,7 @@
       // Правим цену
       newElement.querySelector('.popup__price').textContent = adsObject.offer.price + ' ₽/ночь';
       // Правим тим жилища
-      newElement.querySelector('h4').textContent = FlatType.TRANSLATE[adsObject.offer.type];
+      newElement.querySelector('h4').textContent = TRANSLATE[adsObject.offer.type];
       // Ищем по 'p'
       var paragraphOfElement = newElement.querySelectorAll('p');
       // Правим данные о комнатах и гостях
