@@ -70,25 +70,13 @@
   /**
    * Функция, объединяющкая действия при нажатии энтера и клика
    */
-  var similarReactionForMouseAndKeybord = function () {
+  var loadAndActivateMap = function () {
     // Качаем объявлеия
     window.backend.download(onLoad, onError);
     // Активируем всю страницу
     deactivateAllPage(mapBlock, noticeForm, false);
     // Удаляем обработчики
-    buttonOfMapActivation.removeEventListener('mouseup', onButtonMouseup);
     buttonOfMapActivation.removeEventListener('keydown', onButtonKeydown);
-  };
-
-  /**
-   * Функция - обработчик события клика по кнопке
-   * @param {object} evt - объектс с данными о событии
-   */
-  var onButtonMouseup = function (evt) {
-    similarReactionForMouseAndKeybord();
-    // прописываем в поле адрес положение мышки в момент клика
-    window.form.setAddress(window.pin.address.getX(evt.pageX, evt.layerX, mapBlock),
-        window.pin.address.getY(evt.pageY, evt.layerY));
   };
 
   /**
@@ -97,7 +85,7 @@
    */
   var onButtonKeydown = function (evt) {
     if (evt.keyCode === KEY_CODES.enter) {
-      similarReactionForMouseAndKeybord();
+      loadAndActivateMap();
     }
   };
 
@@ -106,9 +94,6 @@
 
   // Вешаем обработчик на нажатие клавиши ENTER по кнопке активации карты
   buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
-
-  // Вешаем обработчик событий на клик по кнопке активации карты
-  buttonOfMapActivation.addEventListener('mouseup', onButtonMouseup);
 
   // Находим шаблон для карточки
   var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
@@ -211,6 +196,9 @@
      * Функция - обработчик события отпускания мыши после движения
      */
     var onMouseUpAfterMove = function () {
+      if (mapBlock.classList.contains('map--faded')) {
+        loadAndActivateMap();
+      }
       mapBlock.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUpAfterMove);
     };
@@ -274,8 +262,6 @@
     window.card.close(mapBlock);
     // Вешаем обработчик на нажатие клавиши ENTER по кнопке активации карты
     buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
-    // Вешаем обработчик событий на клик по кнопке активации карты
-    buttonOfMapActivation.addEventListener('mouseup', onButtonMouseup);
     // Навешиваем обработчик на нажатие кнопки мыши
     buttonOfMapActivation.addEventListener('mousedown', onButtonMouseDown);
   };
