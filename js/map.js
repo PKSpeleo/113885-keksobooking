@@ -33,7 +33,7 @@
    */
   var onDocumentKeydown = function (evt) {
     if (evt.keyCode === KEY_CODES.esc) {
-      mapBlock.removeChild(mapBlock.querySelector('.popup'));
+      window.card.close(mapBlock);
       document.removeEventListener('keydown', onDocumentKeydown);
     }
   };
@@ -42,10 +42,10 @@
   var buttonOfMapActivation = document.querySelector('.map__pin--main');
 
   /**
-   * Функция акивации и деактивации страницы и рисования пинов
+   * Функция акивации и деактивации страницы
    * @param {object} blockOfMap - блок карты
    * @param {object} blockOfForm - блок формы
-   * @param {boolean} status - Если True - то видно, если False - то нет;)
+   * @param {boolean} status - Если True - то деактивирована, если False - активирована;)
    */
   var deactivateAllPage = function (blockOfMap, blockOfForm, status) {
     setOrRemoveClassMapFaded(blockOfMap, status);
@@ -68,18 +68,27 @@
   };
 
   /**
+   * Функция, объединяющкая действия при нажатии энтера и клика
+   */
+  var similarReactionForMouseAndKeybord = function () {
+    // Качаем объявлеия
+    window.backend.download(onLoad, onError);
+    // Активируем всю страницу
+    deactivateAllPage(mapBlock, noticeForm, false);
+    // Удаляем обработчики
+    buttonOfMapActivation.removeEventListener('mouseup', onButtonMouseup);
+    buttonOfMapActivation.removeEventListener('keydown', onButtonKeydown);
+  };
+
+  /**
    * Функция - обработчик события клика по кнопке
    * @param {object} evt - объектс с данными о событии
    */
   var onButtonMouseup = function (evt) {
-    // Активируем все
-    window.backend.download(onLoad, onError);
-    deactivateAllPage(mapBlock, noticeForm, false);
+    similarReactionForMouseAndKeybord();
     // прописываем в поле адрес положение мышки в момент клика
     window.form.setAddress(window.pin.address.getX(evt.pageX, evt.layerX, mapBlock),
         window.pin.address.getY(evt.pageY, evt.layerY));
-    buttonOfMapActivation.removeEventListener('mouseup', onButtonMouseup);
-    buttonOfMapActivation.removeEventListener('keydown', onButtonKeydown);
   };
 
   /**
@@ -88,11 +97,7 @@
    */
   var onButtonKeydown = function (evt) {
     if (evt.keyCode === KEY_CODES.enter) {
-      window.backend.download(onLoad, onError);
-      deactivateAllPage(mapBlock, noticeForm, false);
-      // Удаляем обработчики
-      buttonOfMapActivation.removeEventListener('mouseup', onButtonMouseup);
-      buttonOfMapActivation.removeEventListener('keydown', onButtonKeydown);
+      similarReactionForMouseAndKeybord();
     }
   };
 
@@ -129,9 +134,7 @@
       // Проверяем, открыта ли карточка. Если открыта, то удаляем перед отрисовкой новой.
       // Удаляем из отображения, а уже ПОТОМ отрисовываем карточку (код ниже)
 
-      if (mapBlock.querySelector('.popup')) {
-        mapBlock.removeChild(mapBlock.querySelector('.popup'));
-      }
+      window.card.close(mapBlock);
       // Отрисовываем там, где надо
       mapBlock.insertBefore(mapCardFragment, mapFiltersContainer);
       // Вешаем обработчик на клавишу ESC по всей карте
@@ -139,7 +142,7 @@
 
     } else if (evt.target.className === 'popup__close') {
       // Если кликнули по кнопке закрытия карточки - удаляем ее
-      mapBlock.removeChild(mapBlock.querySelector('.popup'));
+      window.card.close(mapBlock);
       // Удаляем обработчик нажатия на ESC
       document.removeEventListener('keydown', onDocumentKeydown);
     }
@@ -268,6 +271,7 @@
     window.pin.resetMain(buttonOfMapActivation);
     deactivateAllPage(mapBlock, noticeForm, true);
     window.pin.deleteAllSimilarPins(mapBlock);
+    window.card.close(mapBlock);
     // Вешаем обработчик на нажатие клавиши ENTER по кнопке активации карты
     buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
     // Вешаем обработчик событий на клик по кнопке активации карты

@@ -24,7 +24,6 @@
   var makeLoadToDirection = function (xhr, onLoad, onError) {
     xhr.responseType = 'json';
     xhr.addEventListener('load', function () {
-      debugger;
       if (xhr.status === SUCCESSFUL_CODE) {
         onLoad(xhr.response);
       } else {

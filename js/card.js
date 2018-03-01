@@ -42,6 +42,12 @@
     }
   };
   window.card = {
+    close: function (mapBlock) {
+      var popup = mapBlock.querySelector('.popup');
+      if (popup) {
+        mapBlock.removeChild(popup);
+      }
+    },
     /**
      * Функция создает DOM элемент карточки на основе JS объекта, шаблона
      * и вариантов перевода;_
