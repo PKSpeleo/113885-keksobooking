@@ -118,7 +118,6 @@
       var mapFiltersContainer = document.querySelector('.map__filters-container');
       // Проверяем, открыта ли карточка. Если открыта, то удаляем перед отрисовкой новой.
       // Удаляем из отображения, а уже ПОТОМ отрисовываем карточку (код ниже)
-
       window.card.close(mapBlock);
       // Отрисовываем там, где надо
       mapBlock.insertBefore(mapCardFragment, mapFiltersContainer);
