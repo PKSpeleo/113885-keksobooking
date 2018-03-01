@@ -1,10 +1,21 @@
 'use strict';
 (function () {
-
-// Коды клавиатуры
+  var INIT_ADDRESS = {
+    x: 600,
+    y: 352
+  };
+  // Коды клавиатуры
   var KEY_CODES = {
     enter: 13,
     esc: 27
+  };
+
+  // Орграничения положения пина на карте
+  var PIN_LIMIT = {
+    up: 150,
+    down: 500,
+    left: 0,
+    right: 1200
   };
 
   // Генерируем обявления
@@ -51,11 +62,11 @@
    * @param {object} evt - объектс с данными о событии
    */
   var onButtonMouseup = function (evt) {
+    // Активируем все
     activateAndDrawPins(mapBlock, noticeForm, false);
     // прописываем в поле адрес положение мышки в момент клика
-    addressField.setAttribute(
-        'value', evt.pageX + ' , ' + evt.pageY);
-    // Удаляем обработчики
+    window.form.setAddress(window.pin.address.getX(evt.pageX, evt.layerX, mapBlock),
+        window.pin.address.getY(evt.pageY, evt.layerY));
     buttonOfMapActivation.removeEventListener('mouseup', onButtonMouseup);
     buttonOfMapActivation.removeEventListener('keydown', onButtonKeydown);
   };
@@ -76,10 +87,10 @@
   // Для начала делаем страницу неактивной.
   window.activation.setActiveOrInactivePage(mapBlock, noticeForm, true);
 
-  // Находим поле ядреса
-  var addressField = document.querySelector('#address');
   // Прописываем начальный адрес
-  document.querySelector('#address').setAttribute('value', '600, 375');
+  // document.querySelector('#address').setAttribute('value', '600, 375');
+  // debugger;
+  window.form.setAddress(INIT_ADDRESS.x, INIT_ADDRESS.y);
 
   // Вешаем обработчик на нажатие клавиши ENTER по кнопке активации карты
   buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
@@ -126,6 +137,86 @@
       document.removeEventListener('keydown', onDocumentKeydown);
     }
   };
-})();
 
+  /**
+   * Функция - обработчик события движения начиная с нажатия кнопки мыши
+   * @param {object} evtDown - объект с данными о событии нажатия
+   */
+  var onButtonMouseDown = function (evtDown) {
+    // На всякий пожарный
+    evtDown.preventDefault();
+
+    // Запоминаем начальные координаты клика
+    var startPosition = {
+      // Где нажали относительно страницы
+      pageX: evtDown.pageX,
+      pageY: evtDown.pageY,
+      // Где нажали относительно нажатого элемента
+      layerX: evtDown.layerX,
+      layerY: evtDown.layerY
+    };
+
+    /**
+     * Функция - обработчик событияя движения мыши
+     * @param {object} evtMove - объект с данными о событии
+     */
+    var onMouseMove = function (evtMove) {
+      // На всякий пожарный
+      evtMove.preventDefault();
+      // Просто создали
+      var tempCoord = {};
+
+      // Проверяем на то, в нужных ли пределах наша метка
+      if ((window.pin.address.getY(evtMove.pageY, startPosition.layerY) > PIN_LIMIT.down) ||
+        (window.pin.address.getY(evtMove.pageY, startPosition.layerY) < PIN_LIMIT.up) ||
+        (window.pin.address.getX(evtMove.pageX, startPosition.layerX, mapBlock) < PIN_LIMIT.left) ||
+        (window.pin.address.getX(evtMove.pageX, startPosition.layerX, mapBlock) > PIN_LIMIT.right)) {
+        // Если за пределами, то используем старые координаты
+        tempCoord.pageY = startPosition.pageY;
+        tempCoord.pageX = startPosition.pageX;
+      } else {
+        // Если в пределах - то используем новые координаты
+        tempCoord.pageX = evtMove.pageX;
+        tempCoord.pageY = evtMove.pageY;
+      }
+      // Вычисляем смещение. Если новые - то смещаемся. Если старые - то нет.
+      var shift = {
+        x: startPosition.pageX - tempCoord.pageX,
+        y: startPosition.pageY - tempCoord.pageY
+      };
+
+      // Заполняем поле адреса
+      window.form.setAddress(window.pin.address.getX(tempCoord.pageX, startPosition.layerX, mapBlock),
+          window.pin.address.getY(tempCoord.pageY, startPosition.layerY));
+
+      // Переназначем опорные координаты
+      startPosition.pageX = tempCoord.pageX;
+      startPosition.pageY = tempCoord.pageY;
+
+      // Двигаем пин с помощью вычесленных ранее смещений
+      window.pin.move(buttonOfMapActivation, shift);
+
+    };
+
+    /**
+     * Функция - обработчик события отпускания мыши после движения
+     */
+    var onMouseUpAfterMove = function () {
+      mapBlock.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUpAfterMove);
+    };
+
+    // Навешиваем обработчик на движение мыши
+    mapBlock.addEventListener('mousemove', onMouseMove);
+
+    // Навешиваем обработчик на отпускание кнопки мыши
+    document.addEventListener('mouseup', onMouseUpAfterMove);
+  };
+
+  // Навешиваем обработчик на нажатие кнопки мыши
+  buttonOfMapActivation.addEventListener('mousedown', onButtonMouseDown);
+
+  // Корректируем форму
+  window.form.init();
+})();
 
