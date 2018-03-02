@@ -305,11 +305,14 @@
   // Где у нас форма с фильтами
   var filtersForm = document.querySelector('.map__filters');
   var onFiltersFormChange = function (evt) {
-    adsArrayFiltered = window.filters.makeFiltration(evt, adsArrayOriginal, filtersForm);
-    window.pin.deleteAllSimilarPins(mapBlock);
-    window.pin.draw(adsArrayFiltered, mapBlock);
-    adsArrayForOnMapClick = adsArrayFiltered;
-    window.card.close(mapBlock);
+    var filtrate = function () {
+      adsArrayFiltered = window.filters.makeFiltration(evt, adsArrayOriginal, filtersForm);
+      window.pin.deleteAllSimilarPins(mapBlock);
+      window.pin.draw(adsArrayFiltered, mapBlock);
+      adsArrayForOnMapClick = adsArrayFiltered;
+      window.card.close(mapBlock);
+    };
+    window.util.debounce(filtrate);
   };
   filtersForm.addEventListener('change', onFiltersFormChange);
 
