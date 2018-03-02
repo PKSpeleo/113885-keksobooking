@@ -18,7 +18,8 @@
   var TIMEOUT_FOR_ERROR = 10000;
 
   // Пусть будет видна во всем map.js!
-  var adsArray = [];
+  var adsArrayOriginal = [];
+  var adsArrayForOnMapClick = [];
   var adsArrayFiltered = [];
 
   // Ищим блок с картой
@@ -114,7 +115,7 @@
         evt.target.parentNode.dataset.addId;
       // Создаем и заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
       var mapCardFragment = window.card.createMapElement(
-          adsArray[addIndex], mapCardTemplate);
+          adsArrayForOnMapClick[addIndex], mapCardTemplate);
       // Находим, куда засовывать фрагмент с диалогом
       var mapFiltersContainer = document.querySelector('.map__filters-container');
       // Проверяем, открыта ли карточка. Если открыта, то удаляем перед отрисовкой новой.
@@ -221,8 +222,9 @@
    * @param {object} dataFromServer - объект с данными ответа сервера
    */
   var onLoad = function (dataFromServer) {
-    adsArray = dataFromServer;
-    window.pin.draw(adsArray, mapBlock);
+    adsArrayOriginal = dataFromServer;
+    adsArrayForOnMapClick = adsArrayOriginal;
+    window.pin.draw(adsArrayOriginal, mapBlock);
     // Вешаем обработчик клика по карте в поисках метки
     mapBlock.addEventListener('click', onMapClick);
   };
@@ -255,6 +257,7 @@
    */
   var resetAll = function () {
     noticeForm.reset();
+    filtersForm.reset();
     window.form.init();
     window.pin.resetMain(buttonOfMapActivation);
     deactivateAllPage(mapBlock, noticeForm, true);
@@ -302,7 +305,11 @@
   // Где у нас форма с фильтами
   var filtersForm = document.querySelector('.map__filters');
   var onFiltersFormChange = function (evt) {
-    adsArrayFiltered = window.filters.makeFiltration(evt, adsArray, filtersForm);
+    adsArrayFiltered = window.filters.makeFiltration(evt, adsArrayOriginal, filtersForm);
+    window.pin.deleteAllSimilarPins(mapBlock);
+    window.pin.draw(adsArrayFiltered, mapBlock);
+    adsArrayForOnMapClick = adsArrayFiltered;
+    window.card.close(mapBlock);
   };
   filtersForm.addEventListener('change', onFiltersFormChange);
 

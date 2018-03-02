@@ -50,6 +50,12 @@
       var elevatorCheckbox = filtersForm.querySelector('#filter-elevator');
       var conditionerCheckbox = filtersForm.querySelector('#filter-conditioner');
 
+      /**
+       * Функция, возвращающая флаг в зависимости, подходит ли данное объявление
+       * под филтр
+       * @param {object} ad - Объект одного объявления, которое мы проеряем
+       * @return {boolean} - tru - подходит, false - не подходит
+       */
       var filterAds = function (ad) {
         var flagType = ((housingType[typeFilter.value] === 'any') ||
           (housingType[typeFilter.value] === (ad.offer.type)));
@@ -59,7 +65,7 @@
         var flagRooms = ((roomsFilter.value === 'any') ||
           (housingRooms[roomsFilter.value] === (ad.offer.rooms)));
         var flagGuest = ((guestsFilter.value === 'any') ||
-          (housingGuests[guestsFilter.value] === (ad.offer.rooms)));
+          (housingGuests[guestsFilter.value] === (ad.offer.guests)));
         var flagWifi = ((!wifiCheckbox.checked) ||
           ((ad.offer.features.includes('wifi')) && (wifiCheckbox.checked)));
         var flagDishwasher = ((!dishwasherCheckbox.checked) ||
@@ -74,10 +80,9 @@
           ((ad.offer.features.includes('conditioner')) && (conditionerCheckbox.checked)));
         var totalFlag = flagType && flagPrice && flagRooms && flagGuest &&
           flagWifi && flagDishwasher && flagParking && flagWasher && flagElevator && flagConditioner;
-        debugger;
         return totalFlag;
       };
-      var filteredAds = adsArray.filter(filterAds);
+      return adsArray.filter(filterAds);
     }
   };
 })();
