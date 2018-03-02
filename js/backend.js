@@ -17,12 +17,14 @@
 
   /**
    * Функция DRY - тобы не писать ниже повторы
-   * @param {object} xhr - xhr:)
    * @param {function} onLoad - колбек для удачного варианта
    * @param {function} onError - колбек для выдачи ошибки
+   * @return {XMLHttpRequest} - возвращаем собственно xhr
    */
-  var makeLoadToDirection = function (xhr, onLoad, onError) {
+  var makeLoadToDirection = function (onLoad, onError) {
+    var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
+    xhr.timeout = TIMEOUT;
     xhr.addEventListener('load', function () {
       if (xhr.status === SUCCESSFUL_CODE) {
         onLoad(xhr.response);
@@ -36,7 +38,7 @@
     xhr.addEventListener('timeout', function () {
       onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
-    xhr.timeout = TIMEOUT;
+    return xhr;
   };
   window.backend = {
     /**
@@ -47,8 +49,7 @@
      * которая срабатывает при неуспешном выполнении запроса
      */
     download: function (onLoad, onError) {
-      var xhr = new XMLHttpRequest();
-      makeLoadToDirection(xhr, onLoad, onError);
+      var xhr = makeLoadToDirection(onLoad, onError);
       xhr.open('GET', DOWNLOAD_URL);
       xhr.send();
     },
@@ -62,8 +63,7 @@
      * которая срабатывает при неуспешном выполнении запроса
      */
     upload: function (data, onLoad, onError) {
-      var xhr = new XMLHttpRequest();
-      makeLoadToDirection(xhr, onLoad, onError);
+      var xhr = makeLoadToDirection(onLoad, onError);
       xhr.open('POST', UPLOAD_URL);
       xhr.send(data);
     }

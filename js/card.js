@@ -55,10 +55,7 @@
      * @param {object} template - шаблон
      * @return {ActiveX.IXMLDOMNode | Node} - возвращает заполненный блок
      */
-    createMapCardElement: function (adsObject, template) {
-      // Создаем блок для заполнения
-      var domBlock = document.createDocumentFragment();
-      // Копирумем шаблон
+    createMapElement: function (adsObject, template) {
       var newElement = template.cloneNode(true);
       // Правим заголовок
       newElement.querySelector('h3').textContent = adsObject.offer.title;
@@ -84,10 +81,7 @@
       fillPopupPictureBlock(newElement.querySelector('.popup__pictures'), adsObject.offer.photos);
       // Меняе SRC....
       newElement.querySelector('.popup__avatar').setAttribute('src', adsObject.author.avatar);
-      // Аппендим все в дом элемент
-      domBlock.appendChild(newElement);
-      // Возвращаем дом элемент
-      return domBlock;
+      return newElement;
     }
   };
 })();

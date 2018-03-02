@@ -11,6 +11,8 @@
     x: '600',
     y: '420'
   };
+  // Ограничиваем количество пинов на экране
+  var PINS_QUANTITY_LIMIT = 5;
   // находим шаблон
   var templateFragment = document.querySelector('template').content;
 
@@ -19,6 +21,7 @@
 
   /**
    * функцию создания DOM-элемента маркера на основе JS-объекта
+   * (создает один маркер)
    * @param {object} adObject - Объект с объявлением
    * @param {number} index - индекс объявления (для идентификации маркера)
    * @param {object} templateObject - Объект с шаблоном
@@ -26,7 +29,7 @@
    * @param {number} offsetY - отступ стрелки маркера по оси У
    * @return {IXMLDOMNode | Node} - баттан, который возвращается
    */
-  var createMapMarkerElement = function (adObject, index, templateObject, offsetX, offsetY) {
+  var createMapPin = function (adObject, index, templateObject, offsetX, offsetY) {
     // Задаем положение указателя со смещением
     var button = templateObject.cloneNode(true);
     button.style.left = (adObject.location.x - offsetX) + 'px';
@@ -49,13 +52,13 @@
    * @param {object} markerOffset - отступ маркера по оси Х и Y в объекте
    * @return {DocumentFragment} - возвращает заполненный DOM блок с маркерами
    */
-  var createMapFragmentByMarkersWithTemplate = function (
+  var createMapPins = function (
       ads, templateBlock, markerOffset) {
     // Создаем блок
     var domBlock = document.createDocumentFragment();
-    // Пишем в блок маркеры
+    // Пишем в блок маркеры, которые создаем
     for (var j = 0; j < ads.length; j++) {
-      domBlock.appendChild(createMapMarkerElement(
+      domBlock.appendChild(createMapPin(
           ads[j], j, templateBlock, markerOffset.x, markerOffset.y));
     }
     return domBlock;
@@ -86,10 +89,12 @@
      * @param {array} adsArrayRandom - массив объявлений
      * @param {object} mapBlock - блок карты
      */
-    drawPins: function (adsArrayRandom, mapBlock) {
+    draw: function (adsArrayRandom, mapBlock) {
+      // Ограничиваем количество маркеров на экране
+      var limitedQuantityAds = adsArrayRandom.slice(0, PINS_QUANTITY_LIMIT);
       // Создаем и заполняем фрагмент маркеров объявлениями
-      var mapMarkersFragment = createMapFragmentByMarkersWithTemplate(
-          adsArrayRandom, mapMarketTemplateFragment, MAP_MARKER_OFFSET);
+      var mapMarkersFragment = createMapPins(
+          limitedQuantityAds, mapMarketTemplateFragment, MAP_MARKER_OFFSET);
       // Находим, где отрисоовывать фрагмент маркеров
       var mapMarker = mapBlock.querySelector('.map__pins');
       mapMarker.appendChild(mapMarkersFragment);

@@ -18,7 +18,9 @@
   var TIMEOUT_FOR_ERROR = 10000;
 
   // Пусть будет видна во всем map.js!
-  var adsArray = [];
+  var adsArrayOriginal = [];
+  var adsArrayForOnMapClick = [];
+  var adsArrayFiltered = [];
 
   // Ищим блок с картой
   var mapBlock = document.querySelector('.map');
@@ -45,22 +47,22 @@
    * Функция акивации и деактивации страницы
    * @param {object} blockOfMap - блок карты
    * @param {object} blockOfForm - блок формы
-   * @param {boolean} status - Если True - то деактивирована, если False - активирована;)
+   * @param {boolean} deactivation - Если True - то деактивирована, если False - активирована;)
    */
-  var deactivateAllPage = function (blockOfMap, blockOfForm, status) {
-    setOrRemoveClassMapFaded(blockOfMap, status);
-    window.form.setOrRemoveAttributeDisable(blockOfForm, status);
-    window.form.setOrRemoveClassNoticeFormDisabled(blockOfForm, status);
+  var deactivateAllPage = function (blockOfMap, blockOfForm, deactivation) {
+    fadeMap(blockOfMap, deactivation);
+    window.form.blockFormFields(blockOfForm, deactivation);
+    window.form.fadeFormFields(blockOfForm, deactivation);
   };
 
   /**
    * Функция, которая скрывает или показывает блок карты, удаляя или добавляя
    * класс 'map--faded'
    * @param {object} block - блок для манипуляций
-   * @param {boolean} status - видно или нет
+   * @param {boolean} deactivation - видно или нет
    */
-  var setOrRemoveClassMapFaded = function (block, status) {
-    if (status) {
+  var fadeMap = function (block, deactivation) {
+    if (deactivation) {
       block.classList.add('map--faded');
     } else {
       block.classList.remove('map--faded');
@@ -70,25 +72,13 @@
   /**
    * Функция, объединяющкая действия при нажатии энтера и клика
    */
-  var similarReactionForMouseAndKeybord = function () {
+  var loadAndActivateMap = function () {
     // Качаем объявлеия
     window.backend.download(onLoad, onError);
     // Активируем всю страницу
     deactivateAllPage(mapBlock, noticeForm, false);
-    // Удаляем обработчики
-    buttonOfMapActivation.removeEventListener('mouseup', onButtonMouseup);
+    // Удаляем обработчики нажатия клавы
     buttonOfMapActivation.removeEventListener('keydown', onButtonKeydown);
-  };
-
-  /**
-   * Функция - обработчик события клика по кнопке
-   * @param {object} evt - объектс с данными о событии
-   */
-  var onButtonMouseup = function (evt) {
-    similarReactionForMouseAndKeybord();
-    // прописываем в поле адрес положение мышки в момент клика
-    window.form.setAddress(window.pin.address.getX(evt.pageX, evt.layerX, mapBlock),
-        window.pin.address.getY(evt.pageY, evt.layerY));
   };
 
   /**
@@ -97,7 +87,7 @@
    */
   var onButtonKeydown = function (evt) {
     if (evt.keyCode === KEY_CODES.enter) {
-      similarReactionForMouseAndKeybord();
+      loadAndActivateMap();
     }
   };
 
@@ -106,9 +96,6 @@
 
   // Вешаем обработчик на нажатие клавиши ENTER по кнопке активации карты
   buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
-
-  // Вешаем обработчик событий на клик по кнопке активации карты
-  buttonOfMapActivation.addEventListener('mouseup', onButtonMouseup);
 
   // Находим шаблон для карточки
   var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
@@ -127,13 +114,12 @@
       var addIndex = evt.target.dataset.addId ||
         evt.target.parentNode.dataset.addId;
       // Создаем и заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
-      var mapCardFragment = window.card.createMapCardElement(
-          adsArray[addIndex], mapCardTemplate);
+      var mapCardFragment = window.card.createMapElement(
+          adsArrayForOnMapClick[addIndex], mapCardTemplate);
       // Находим, куда засовывать фрагмент с диалогом
       var mapFiltersContainer = document.querySelector('.map__filters-container');
       // Проверяем, открыта ли карточка. Если открыта, то удаляем перед отрисовкой новой.
       // Удаляем из отображения, а уже ПОТОМ отрисовываем карточку (код ниже)
-
       window.card.close(mapBlock);
       // Отрисовываем там, где надо
       mapBlock.insertBefore(mapCardFragment, mapFiltersContainer);
@@ -211,6 +197,9 @@
      * Функция - обработчик события отпускания мыши после движения
      */
     var onMouseUpAfterMove = function () {
+      if (mapBlock.classList.contains('map--faded')) {
+        loadAndActivateMap();
+      }
       mapBlock.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUpAfterMove);
     };
@@ -233,8 +222,9 @@
    * @param {object} dataFromServer - объект с данными ответа сервера
    */
   var onLoad = function (dataFromServer) {
-    adsArray = dataFromServer;
-    window.pin.drawPins(adsArray, mapBlock);
+    adsArrayOriginal = dataFromServer;
+    adsArrayForOnMapClick = adsArrayOriginal;
+    window.pin.draw(adsArrayOriginal, mapBlock);
     // Вешаем обработчик клика по карте в поисках метки
     mapBlock.addEventListener('click', onMapClick);
   };
@@ -267,6 +257,7 @@
    */
   var resetAll = function () {
     noticeForm.reset();
+    filtersForm.reset();
     window.form.init();
     window.pin.resetMain(buttonOfMapActivation);
     deactivateAllPage(mapBlock, noticeForm, true);
@@ -274,8 +265,6 @@
     window.card.close(mapBlock);
     // Вешаем обработчик на нажатие клавиши ENTER по кнопке активации карты
     buttonOfMapActivation.addEventListener('keydown', onButtonKeydown);
-    // Вешаем обработчик событий на клик по кнопке активации карты
-    buttonOfMapActivation.addEventListener('mouseup', onButtonMouseup);
     // Навешиваем обработчик на нажатие кнопки мыши
     buttonOfMapActivation.addEventListener('mousedown', onButtonMouseDown);
   };
@@ -312,6 +301,20 @@
   };
   // Вешаем обработчик на клик по сбросу
   resetButton.addEventListener('click', onResetButtonClick);
+
+  // Где у нас форма с фильтами
+  var filtersForm = document.querySelector('.map__filters');
+  var onFiltersFormChange = function (evt) {
+    var filtrate = function () {
+      adsArrayFiltered = window.filters.makeFiltration(evt, adsArrayOriginal, filtersForm);
+      window.pin.deleteAllSimilarPins(mapBlock);
+      window.pin.draw(adsArrayFiltered, mapBlock);
+      adsArrayForOnMapClick = adsArrayFiltered;
+      window.card.close(mapBlock);
+    };
+    window.util.debounce(filtrate);
+  };
+  filtersForm.addEventListener('change', onFiltersFormChange);
 
 })();
 

@@ -1,6 +1,12 @@
 'use strict';
 (function () {
-  // Мапа для типов жидищь
+  // Нужности для правки атрибутов форм
+  var FIELD_ATTRIBUTES = {
+    titleMinLength: 30,
+    titleMaxLength: 100,
+    priceMax: 1000000
+  };
+  // Мап для типов жидищь
   var PRICE_MIN = {
     flat: 1000,
     bungalo: 0,
@@ -23,15 +29,15 @@
     var titleField = blockDom.querySelector('#title');
     // Правим атрибуты заголовка
     titleField.setAttribute('required', '');
-    titleField.setAttribute('minlength', '30');
-    titleField.setAttribute('maxlength', '100');
+    titleField.setAttribute('minlength', FIELD_ATTRIBUTES.titleMinLength);
+    titleField.setAttribute('maxlength', FIELD_ATTRIBUTES.titleMaxLength);
     // Прописываем начальный адрес
     window.form.setAddress(MAIN_PIN.x, MAIN_PIN.y);
     // Где же поле цены?
     var priceInput = blockDom.querySelector('#price');
     // Правим статичные атрибуты цены
     priceInput.setAttribute('required', '');
-    priceInput.setAttribute('max', '1000000');
+    priceInput.setAttribute('max', FIELD_ATTRIBUTES.priceMax);
     // Где же тип жилья?
     var typeField = blockDom.querySelector('#type');
     priceInput.setAttribute('min', flatMapa[typeField.value]);
@@ -195,10 +201,6 @@
     // Функция, навешивающая изменения в поле количесва комнат
     addChangeListenerForRoomsAndCapacity(
         roomNumberField, roomNumberVariants, capacityField, capacityFieldVariants);
-
-    // А эти строчки, чтобы форма отправлялась в адресную строчку, чтобы можно было проверить;)
-    blockDom.querySelector('form').setAttribute('action', '/123.txt');
-    blockDom.querySelector('form').setAttribute('method', 'get');
   };
 
   // Находим, где же форма
@@ -221,13 +223,14 @@
     },
     /**
      * Функция, отлючающая или включающая возможность заполнения форм
+     * (в форме блокирует все поля)
      * удаляя или добавляя атрибут disabled в fieldset
      * @param {object} block - блок, в котором мы отключаем
-     * @param {boolean} status - добавлен атрибут или нет
+     * @param {boolean} deactivation - добавлен атрибут или нет
      */
-    setOrRemoveAttributeDisable: function (block, status) {
+    blockFormFields: function (block, deactivation) {
       var fieldset = block.querySelectorAll('fieldset');
-      if (status) {
+      if (deactivation) {
         fieldset.forEach(function (value) {
           value.setAttribute('disabled', '');
         });
@@ -239,11 +242,12 @@
     },
     /**
      * Функция, которая удаляет или добавля класс notice__form--disabled
+     * (затемняет форму)
      * @param {object} block - блок в котором меняем класс
-     * @param {boolean} status - есть класс или нет
+     * @param {boolean} deactivation - есть класс или нет
      */
-    setOrRemoveClassNoticeFormDisabled: function (block, status) {
-      if (status) {
+    fadeFormFields: function (block, deactivation) {
+      if (deactivation) {
         block.classList.add('notice__form--disabled');
       } else {
         block.classList.remove('notice__form--disabled');
