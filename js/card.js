@@ -55,7 +55,7 @@
      * @param {object} template - шаблон
      * @return {ActiveX.IXMLDOMNode | Node} - возвращает заполненный блок
      */
-    createMapCardElement: function (adsObject, template) {
+    createMapElement: function (adsObject, template) {
       var newElement = template.cloneNode(true);
       // Правим заголовок
       newElement.querySelector('h3').textContent = adsObject.offer.title;

@@ -112,7 +112,7 @@
       var addIndex = evt.target.dataset.addId ||
         evt.target.parentNode.dataset.addId;
       // Создаем и заполняем фрагмент катрочкой, уж извините - не функция, т.к. всего один вариант;)
-      var mapCardFragment = window.card.createMapCardElement(
+      var mapCardFragment = window.card.createMapElement(
           adsArray[addIndex], mapCardTemplate);
       // Находим, куда засовывать фрагмент с диалогом
       var mapFiltersContainer = document.querySelector('.map__filters-container');
