@@ -75,7 +75,7 @@
     window.backend.download(onLoad, onError);
     // Активируем всю страницу
     deactivateAllPage(mapBlock, noticeForm, false);
-    // Удаляем обработчики
+    // Удаляем обработчики нажатия клавы
     buttonOfMapActivation.removeEventListener('keydown', onButtonKeydown);
   };
 
