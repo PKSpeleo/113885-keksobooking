@@ -4,7 +4,7 @@
   var FIELD_ATTRIBUTES = {
     titleMinLength: 30,
     titleMaxLength: 100,
-    priceMax: 1000000,
+    priceMax: 1000000
   };
   // Мап для типов жидищь
   var PRICE_MIN = {
