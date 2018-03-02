@@ -19,6 +19,7 @@
 
   // Пусть будет видна во всем map.js!
   var adsArray = [];
+  var adsArrayFiltered = [];
 
   // Ищим блок с картой
   var mapBlock = document.querySelector('.map');
@@ -297,6 +298,13 @@
   };
   // Вешаем обработчик на клик по сбросу
   resetButton.addEventListener('click', onResetButtonClick);
+
+  // Где у нас форма с фильтами
+  var filtersForm = document.querySelector('.map__filters');
+  var onFiltersFormChange = function (evt) {
+    adsArrayFiltered = window.filters.makeFiltration(evt, adsArray, filtersForm);
+  };
+  filtersForm.addEventListener('change', onFiltersFormChange);
 
 })();
 
