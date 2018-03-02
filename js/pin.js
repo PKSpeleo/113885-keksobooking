@@ -11,6 +11,8 @@
     x: '600',
     y: '420'
   };
+  // Ограничиваем количество пинов на экране
+  var PINS_QUANTITY_LIMIT = 5;
   // находим шаблон
   var templateFragment = document.querySelector('template').content;
 
@@ -88,9 +90,11 @@
      * @param {object} mapBlock - блок карты
      */
     draw: function (adsArrayRandom, mapBlock) {
+      // Ограничиваем количество маркеров на экране
+      var limitedQuantityAds = adsArrayRandom.slice(0, PINS_QUANTITY_LIMIT);
       // Создаем и заполняем фрагмент маркеров объявлениями
       var mapMarkersFragment = createMapPins(
-          adsArrayRandom, mapMarketTemplateFragment, MAP_MARKER_OFFSET);
+          limitedQuantityAds, mapMarketTemplateFragment, MAP_MARKER_OFFSET);
       // Находим, где отрисоовывать фрагмент маркеров
       var mapMarker = mapBlock.querySelector('.map__pins');
       mapMarker.appendChild(mapMarkersFragment);
