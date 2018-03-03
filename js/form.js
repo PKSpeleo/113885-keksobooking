@@ -203,29 +203,68 @@
         roomNumberField, roomNumberVariants, capacityField, capacityFieldVariants);
 
     // Работа с файлами
-    var noticePhotoBlock = noticeFormBlock.querySelector('.notice__photo');
-    var avatarFileChooser = noticePhotoBlock.querySelector('#avatar');
-    var avatarImgPlace = noticePhotoBlock.querySelector('img');
+    // Сначала ищем нужные места
+    var photoNoticeFormBlock = noticeFormBlock.querySelector('.notice__photo');
+    var avatarFileChooser = photoNoticeFormBlock.querySelector('input');
+    var avatarImgPlace = photoNoticeFormBlock.querySelector('img');
+    var photoFormBlock = noticeFormBlock.querySelector('.form__photo-container');
+    var photoFileChooser = photoFormBlock.querySelector('input');
 
+    // Задаем нужные тыпы файлов и размер картинки в превью
     var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+    var PHOTO_WIDE = 150;
 
-    var onChangeInput = function () {
-      var file = avatarFileChooser.files[0];
-      var fileName = file.name.toLowerCase();
+    /**
+     * Функция по добавлению обработчика собитий на добавления разных фотографий
+     * это не сама функция - обработчик событий.
+     * она нужна для того, чтобы унифицировать установку именно обработчиков
+     * в разные места по добавлению файлов
+     * @param {object} placeToListen - на каком объекте ждем
+     * @param {object} placeToPut - куда вставляем фото
+     * @param {boolean} flagAppendMoreNotPlaceOne - флак отвечающий на вопрос, добавляем
+     * мы дополнительную фотографию или просто вставляем одну единственную.
+     * true - добавляем дополнительную.
+     */
+    var addFileListenerToAndPlaceFileTo = function (placeToListen, placeToPut, flagAppendMoreNotPlaceOne) {
+      /**
+       * Функция - обработчик обытия изменения поля инпуст (ввод файлов)
+       */
+      var onChangeInput = function () {
+        var file = placeToListen.files[0];
+        var fileName = file.name.toLowerCase();
 
-      var matches = FILE_TYPES.some(function (it) {
-        return fileName.endsWith(it);
-      });
-      if (matches) {
-        var reader = new FileReader();
-        reader.addEventListener('load', function () {
-          avatarImgPlace.src = reader.result;
+        var matches = FILE_TYPES.some(function (it) {
+          return fileName.endsWith(it);
         });
-        reader.readAsDataURL(file);
-      }
+        if (matches) {
+          var reader = new FileReader();
+          reader.addEventListener('load', function () {
+            // Проверяем, что делаем - добавляем дополнительный или только один
+            if (flagAppendMoreNotPlaceOne) {
+              // Создаем элемент IMG с нужными атрибутами.
+              var tempImgBlock = document.createElement('img');
+              tempImgBlock.setAttribute('width', PHOTO_WIDE);
+              tempImgBlock.src = reader.result;
+              placeToPut.appendChild(tempImgBlock);
+            } else {
+              placeToPut.src = reader.result;
+            }
+          });
+          reader.readAsDataURL(file);
+        }
+      };
+      placeToListen.addEventListener('change', onChangeInput);
     };
-    avatarFileChooser.addEventListener('change', onChangeInput);
-    debugger;
+    // В размекте нет нужного блока для блока для вставки фото, поэтому создаем его сами
+    var tempPhotosBlock = document.createElement('div');
+    tempPhotosBlock.setAttribute('class', 'photo__preview');
+    photoFormBlock.appendChild(tempPhotosBlock);
+    var photoPlaceToUpload = photoFormBlock.querySelector('.photo__preview');
+    // С помошью хитрой функции и ее параметров навешиваем обработчик на
+    // Добавление файла в аватарку
+    addFileListenerToAndPlaceFileTo(avatarFileChooser, avatarImgPlace, false);
+    // Добавление файла в фотки квартиры
+    addFileListenerToAndPlaceFileTo(photoFileChooser, photoPlaceToUpload, true);
   };
 
   // Находим, где же форма
