@@ -201,6 +201,31 @@
     // Функция, навешивающая изменения в поле количесва комнат
     addChangeListenerForRoomsAndCapacity(
         roomNumberField, roomNumberVariants, capacityField, capacityFieldVariants);
+
+    // Работа с файлами
+    var noticePhotoBlock = noticeFormBlock.querySelector('.notice__photo');
+    var avatarFileChooser = noticePhotoBlock.querySelector('#avatar');
+    var avatarImgPlace = noticePhotoBlock.querySelector('img');
+
+    var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+
+    var onChangeInput = function () {
+      var file = avatarFileChooser.files[0];
+      var fileName = file.name.toLowerCase();
+
+      var matches = FILE_TYPES.some(function (it) {
+        return fileName.endsWith(it);
+      });
+      if (matches) {
+        var reader = new FileReader();
+        reader.addEventListener('load', function () {
+          avatarImgPlace.src = reader.result;
+        });
+        reader.readAsDataURL(file);
+      }
+    };
+    avatarFileChooser.addEventListener('change', onChangeInput);
+    debugger;
   };
 
   // Находим, где же форма
