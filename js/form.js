@@ -124,14 +124,25 @@
       '3': [1, 2, 3],
       '100': [0]
     };
+    var START_ROOM = '1';
+    var START_CAPACITY = '1';
     // Прописываем статичные атрибуты
-    capacityField.setAttribute('required', '');
-    // Для порядка делаем value пустым, чтобы обязать его заполнить выбрав вариант
-    capacityField.value = '';
+    capacityField.setAttribute('required', START_ROOM);
+    // Для порядка делаем value не пустым, а конкретным
+    capacityField.value = START_CAPACITY;
     // Прописываем статичные атрибуты
-    roomNumberField.setAttribute('required', '');
-    // Для порядка делаем value пустым, чтобы обязать его заполнить выбрав вариант
-    roomNumberField.value = '';
+    roomNumberField.setAttribute('required', START_CAPACITY);
+    // Для порядка делаем value пустым, а конкретным
+    roomNumberField.value = START_ROOM;
+    // Приводим первоначальное значение поля гостей в вид по состоянию комнат
+    capacityFieldVariants.forEach(function (variants) {
+      if (variants.value === START_ROOM) {
+        variants.setAttribute('selected', '');
+      } else {
+        variants.removeAttribute('selected');
+        variants.setAttribute('disabled', '');
+      }
+    });
     /**
      * Функция навешивает обработчик на изменения в поле мастер
      * и корректирует видимости вариантов согласно мапе
