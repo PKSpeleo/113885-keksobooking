@@ -219,6 +219,10 @@
     var avatarFileChooseBlock = photoNoticeFormBlock.querySelector('input');
     var avatarImgBlock = photoNoticeFormBlock.querySelector('img');
     var avatarDropZoneBlock = noticeFormBlock.querySelector('.drop-zone');
+    // Сбрасываем на стандартные значения аватарку
+    if (!(avatarImgBlock.src === 'img/muffin.png')) {
+      avatarImgBlock.src = 'img/muffin.png';
+    }
     // Инициируем возможность загрузки файла обычным способом для аватарки
     window.util.initImageUploadTo(avatarFileChooseBlock, avatarImgBlock, false);
     window.util.initDragAndDropImageUploadTo(avatarDropZoneBlock, avatarImgBlock, false);
@@ -227,6 +231,11 @@
     var photoFormBlock = noticeFormBlock.querySelector('.form__photo-container');
     var photoFileChooserBlock = photoFormBlock.querySelector('input');
     var photoDropZoneBlock = photoFormBlock.querySelector('.drop-zone');
+    // Cбрасываем картинки в начальное соатояние если там что-то есть.
+    var photoPrevieBlock = photoFormBlock.querySelector('.photo__preview');
+    if (photoPrevieBlock) {
+      photoFormBlock.removeChild(photoPrevieBlock);
+    }
     // В размекте нет нужного блока для блока для вставки фото, поэтому создаем его сами
     var tempPhotosBlock = document.createElement('div');
     tempPhotosBlock.setAttribute('class', 'photo__preview');
