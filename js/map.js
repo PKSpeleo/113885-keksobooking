@@ -306,7 +306,7 @@
   var filtersForm = document.querySelector('.map__filters');
   var onFiltersFormChange = function (evt) {
     var filtrate = function () {
-      adsArrayFiltered = window.filters.makeFiltration(evt, adsArrayOriginal, filtersForm);
+      adsArrayFiltered = window.filters.makeNewFiltration(evt, adsArrayOriginal, filtersForm);
       window.pin.deleteAllSimilarPins(mapBlock);
       window.pin.draw(adsArrayFiltered, mapBlock);
       adsArrayForOnMapClick = adsArrayFiltered;
