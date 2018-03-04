@@ -11,6 +11,11 @@
     x: '600',
     y: '420'
   };
+  // размеры картиок маркера
+  var PIN_IMAGE_SIZE = {
+    width: 40,
+    height: 40
+  };
   // Ограничиваем количество пинов на экране
   var PINS_QUANTITY_LIMIT = 5;
   // находим шаблон
@@ -38,8 +43,8 @@
     // Цепляем картинку на указатель и задаем ей параметры
     var image = button.querySelector('img');
     image.setAttribute('src', adObject.author.avatar);
-    image.setAttribute('width', '40');
-    image.setAttribute('height', '40');
+    image.setAttribute('width', PIN_IMAGE_SIZE.width);
+    image.setAttribute('height', PIN_IMAGE_SIZE.height);
     image.setAttribute('draggable', 'false');
     return button;
   };
