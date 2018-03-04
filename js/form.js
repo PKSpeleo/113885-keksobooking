@@ -276,6 +276,50 @@
     addFileListenerToAndPlaceFileTo(avatarFileChooser, avatarImgPlace, false);
     // Добавление файла в фотки квартиры
     addFileListenerToAndPlaceFileTo(photoFileChooser, photoPlaceToUpload, true);
+
+    // Drag And Drop File
+    var dropZoneBlock = noticeFormBlock.querySelector('.drop-zone');
+
+    var onLabelDragenter = function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
+    };
+    var onLabelDragover = function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
+    };
+    var onLabelDrop = function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
+      var dt = evt.dataTransfer;
+      var file = dt.files[0];
+      var fileName = file.name.toLowerCase();
+
+      var matches = FILE_TYPES.some(function (it) {
+        return fileName.endsWith(it);
+      });
+      if (matches) {
+        var reader = new FileReader();
+        reader.addEventListener('load', function () {
+          debugger;
+          // Проверяем, что делаем - добавляем дополнительный или только один
+          if (false) {
+            // Создаем элемент IMG с нужными атрибутами.
+            var tempImgBlock = document.createElement('img');
+            tempImgBlock.setAttribute('width', PHOTO_WIDE);
+            tempImgBlock.src = reader.result;
+            avatarImgPlace.appendChild(tempImgBlock);
+          } else {
+            avatarImgPlace.src = reader.result;
+          }
+        });
+        reader.readAsDataURL(file);
+      }
+    };
+    dropZoneBlock.addEventListener('dragenter', onLabelDragenter);
+    dropZoneBlock.addEventListener('dragover', onLabelDragover);
+    dropZoneBlock.addEventListener('drop', onLabelDrop);
+
   };
 
   // Находим, где же форма
