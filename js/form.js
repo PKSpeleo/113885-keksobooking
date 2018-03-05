@@ -240,7 +240,7 @@
     if (photoPrevieBlock) {
       photoFormBlock.removeChild(photoPrevieBlock);
     }
-    // В размекте нет нужного блока для блока для вставки фото, поэтому создаем его сами
+    // В размекте нет нужного блока для блока для вставки фото, поэтому создаем его сами;
     var tempPhotosBlock = document.createElement('div');
     tempPhotosBlock.setAttribute('class', 'photo__preview');
     photoFormBlock.appendChild(tempPhotosBlock);
@@ -248,6 +248,9 @@
     // Инициируем возможность загрузки файлка обычным способом
     window.util.initImageUploadTo(photoFileChooserBlock, photoToUploadBlock, true);
     window.util.initDragAndDropImageUploadTo(photoDropZoneBlock, photoToUploadBlock, true);
+
+    // Инициируем сортировку фоток драг анд дропом
+    window.sorting.makeSortable(photoToUploadBlock);
   };
 
   // Находим, где же форма

@@ -66,8 +66,12 @@
     return ((!block.checked) || ((adFeatures.includes(block.value)) && (block.checked)));
   };
 
-  // А здесь мой разум меня покинул :(((
   window.filters = {
+    /**
+     * Функция фильтрации
+     * @param {array} adsArray - массив для фильтрации
+     * @return {array} - массив отлфильтрованный
+     */
     makeFiltration: function (adsArray) {
       /**
        * Функция, возвращающая флаг в зависимости, подходит ли данное объявление

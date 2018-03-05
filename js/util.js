@@ -30,7 +30,6 @@
           tempImgBlock.setAttribute('width', PHOTO_WIDE);
           tempImgBlock.src = reader.result;
           blockToPut.appendChild(tempImgBlock);
-          window.sorting.makeSortable(blockToPut);
         } else {
           blockToPut.src = reader.result;
         }
