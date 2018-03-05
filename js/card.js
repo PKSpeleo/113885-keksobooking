@@ -36,7 +36,7 @@
   var fillPopupFeaturesBlock = function (listBlock, array) {
     var liList = listBlock.querySelectorAll('.feature');
     for (var i = 0; i < liList.length; i++) {
-      if (!window.util.isInArray(liList[i].classList[1].split('--')[1], array)) {
+      if (!array.includes(liList[i].classList[1].split('--')[1])) {
         listBlock.removeChild(liList[i]);
       }
     }
