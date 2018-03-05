@@ -70,7 +70,7 @@
      * @param {object} slaveBlock - Второе поле (Ведомое)
      * @param {object} slaveBlockVariants - Варианты второго поля (Ведомого)
      */
-    var addMutualChangeListener = function (masterBlock, masterBlockVariants, slaveBlock, slaveBlockVariants) {
+    var initMutualChangeFixation = function (masterBlock, masterBlockVariants, slaveBlock, slaveBlockVariants) {
       /**
        * Собственно сама функция - обработчик события изменения поля
        */
@@ -106,10 +106,10 @@
       masterBlock.addEventListener('change', onTimeFieldsChange);
     };
     // Навешиваем обработчик на изменения в поле timeIn
-    addMutualChangeListener(
+    initMutualChangeFixation(
         timeinField, timeinFieldVariants, timeoutField, timeoutFieldsVariants);
     // Навешиваем обработчик на изменения в поле timeOut
-    addMutualChangeListener(
+    initMutualChangeFixation(
         timeoutField, timeoutFieldsVariants, timeinField, timeinFieldVariants);
 
     // Где же у нас комнаты и вместимость?
@@ -153,7 +153,7 @@
      * @param {object} slaveBlock - Ведомый блок - количество гостей
      * @param {object} slaveBlockVariants - массив объектов варинтов количества гостей
      */
-    var addChangeListenerForRoomsAndCapacity = function (
+    var initChangeFixationForRoomsAndCapacity = function (
         masterBlock, masterBlockVariants, slaveBlock, slaveBlockVariants) {
       /**
        * Функция - обработчик события внесения изменений в поле количества комнат
@@ -210,7 +210,7 @@
       masterBlock.addEventListener('change', onRoomsFieldsChange);
     };
     // Функция, навешивающая изменения в поле количесва комнат
-    addChangeListenerForRoomsAndCapacity(
+    initChangeFixationForRoomsAndCapacity(
         roomNumberField, roomNumberVariants, capacityField, capacityFieldVariants);
 
     // Работа с файлами

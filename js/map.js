@@ -196,19 +196,19 @@
     /**
      * Функция - обработчик события отпускания мыши после движения
      */
-    var onMouseUpAfterMove = function () {
+    var onDocumentMouseUp = function () {
       if (mapBlock.classList.contains('map--faded')) {
         loadAndActivateMap();
       }
       mapBlock.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUpAfterMove);
+      document.removeEventListener('mouseup', onDocumentMouseUp);
     };
 
     // Навешиваем обработчик на движение мыши
     mapBlock.addEventListener('mousemove', onMouseMove);
 
     // Навешиваем обработчик на отпускание кнопки мыши
-    document.addEventListener('mouseup', onMouseUpAfterMove);
+    document.addEventListener('mouseup', onDocumentMouseUp);
   };
 
   // Навешиваем обработчик на нажатие кнопки мыши
@@ -280,13 +280,13 @@
    * Функця - обработчик события клика по отправке
    * @param {object} evt - объект с данными о событии.
    */
-  var onButtonSubmitClick = function (evt) {
+  var onNoticeFormSubmit = function (evt) {
     evt.preventDefault();
     window.backend.upload(new FormData(noticeForm), onUpload, onError);
   };
 
   // Навешиваем обработчик события на кнопку подтердить отпраку
-  noticeForm.addEventListener('submit', onButtonSubmitClick);
+  noticeForm.addEventListener('submit', onNoticeFormSubmit);
 
   // Где же кнопка сброса
   var resetButton = noticeForm.querySelector('.form__reset');
