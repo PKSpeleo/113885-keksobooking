@@ -54,21 +54,21 @@
      * это не сама функция - обработчик событий.
      * она нужна для того, чтобы унифицировать установку именно обработчиков
      * в разные места по добавлению файлов
-     * @param {object} InputBlockToListen - на каком объекте ждем
+     * @param {object} inputBlockToListen - на каком объекте ждем
      * @param {object} blockToPut - куда вставляем фото
      * @param {boolean} flagAppendMoreNotPlaceOne - флаг отвечающий на вопрос, добавляем
      * мы дополнительную фотографию или просто вставляем одну единственную.
      * true - добавляем дополнительную.
      */
-    initImageUploadTo: function (InputBlockToListen, blockToPut, flagAppendMoreNotPlaceOne) {
+    initImageUploadTo: function (inputBlockToListen, blockToPut, flagAppendMoreNotPlaceOne) {
       /**
        * Функция - обработчик cобытия изменения поля инпут (ввод файлов)
        */
       var onChangeInput = function () {
-        var file = InputBlockToListen.files[0];
+        var file = inputBlockToListen.files[0];
         placeImageFileTo(file, blockToPut, flagAppendMoreNotPlaceOne);
       };
-      InputBlockToListen.addEventListener('change', onChangeInput);
+      inputBlockToListen.addEventListener('change', onChangeInput);
     },
     /**
      * Функция по добавлению обработчика собитий на добавления разных фотографий

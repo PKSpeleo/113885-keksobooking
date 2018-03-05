@@ -217,6 +217,8 @@
     // Сначала ищем нужные места для аватарки
     var photoNoticeFormBlock = noticeFormBlock.querySelector('.notice__photo');
     var avatarFileChooseBlock = photoNoticeFormBlock.querySelector('input');
+    // Прописываем имя инпуту, без которого не работает отправка
+    avatarFileChooseBlock.setAttribute('name', 'avatar');
     var avatarImgBlock = photoNoticeFormBlock.querySelector('img');
     var avatarDropZoneBlock = noticeFormBlock.querySelector('.drop-zone');
     // Сбрасываем на стандартные значения аватарку
@@ -230,6 +232,8 @@
     // Ищим нужные места для фоток
     var photoFormBlock = noticeFormBlock.querySelector('.form__photo-container');
     var photoFileChooserBlock = photoFormBlock.querySelector('input');
+    // Прописываем имя инпуту, без которого не работает отправка
+    photoFileChooserBlock.setAttribute('name', 'photos');
     var photoDropZoneBlock = photoFormBlock.querySelector('.drop-zone');
     // Cбрасываем картинки в начальное соатояние если там что-то есть.
     var photoPrevieBlock = photoFormBlock.querySelector('.photo__preview');
