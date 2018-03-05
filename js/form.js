@@ -31,9 +31,9 @@
   /**
    * Функция проверки и подготовки формы к работе
    * @param {object} blockDom - блок с формой
-   * @param {object} flatMapa - объект с мапой по типам жилищь
+   * @param {object} flatMap - объект с мапой по типам жилищь
    */
-  var checkAndChangeNoticeForm = function (blockDom, flatMapa) {
+  var checkAndChangeNoticeForm = function (blockDom, flatMap) {
     // Прописываем начальные значения
     // Где же заголовок?
     var titleField = blockDom.querySelector('#title');
@@ -50,13 +50,13 @@
     priceInput.setAttribute('max', FIELD_ATTRIBUTES.priceMax);
     // Где же тип жилья?
     var typeField = blockDom.querySelector('#type');
-    priceInput.setAttribute('min', flatMapa[typeField.value]);
+    priceInput.setAttribute('min', flatMap[typeField.value]);
     /**
      * Функция - обработчик собитыия на изменения в поле тип жилья
      */
     var onTypeFieldChange = function () {
       // Меняем атрибут минимальноей цены согласно мапе
-      priceInput.setAttribute('min', flatMapa[typeField.value]);
+      priceInput.setAttribute('min', flatMap[typeField.value]);
     };
     // Добавляем обработчик события на изменение поля тип жилья
     typeField.addEventListener('change', onTypeFieldChange);
